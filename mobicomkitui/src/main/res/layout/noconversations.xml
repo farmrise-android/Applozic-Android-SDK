@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/txt_newChat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="New Chat"
+        android:textColor="#169947"
+        android:gravity="end"
+        android:layout_alignParentTop="true"/>
+
+    <ImageView
+        android:id="@+id/img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/mobicom_ic_launcher"
+        android:layout_below="@+id/txt_newChat"
+        android:layout_centerHorizontal="true"
+        android:padding="16dp"
+        android:layout_marginBottom="24dp"/>
+
+
+    <TextView
+        android:id="@+id/startChatting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_margin="16dp"
+        android:text="Start Chatting with a friend"
+        android:textColor="#000000"
+        android:textSize="20sp"
+        android:layout_below="@+id/img"/>
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="24dp"
+        android:text="It's always so much fun"
+        android:textColor="#FF666666"
+        android:layout_below="@+id/startChatting"/>
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="with a friend around"
+        android:textColor="#FF666666"
+        android:layout_below="@+id/textView1"/>
+
+    <Button
+        android:id="@+id/btn_newChat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="16dp"
+        android:textAllCaps="false"
+        android:text="New Chat"
+        android:textColor="#ffffff"
+        android:background="#169947"/>
+
+
+
+
+</RelativeLayout>

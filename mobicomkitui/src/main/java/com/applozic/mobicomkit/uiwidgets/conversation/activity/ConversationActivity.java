@@ -114,7 +114,10 @@ import java.util.Set;
 /**
  * Created by devashish on 6/25/2015.
  */
-public class ConversationActivity extends AppCompatActivity implements MessageCommunicator, MobiComKitActivityInterface, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, ActivityCompat.OnRequestPermissionsResultCallback, MobicomkitUriListener, SearchView.OnQueryTextListener, OnClickReplyInterface {
+public class ConversationActivity extends AppCompatActivity implements MessageCommunicator, MobiComKitActivityInterface,
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+        LocationListener, ActivityCompat.OnRequestPermissionsResultCallback, MobicomkitUriListener,
+        SearchView.OnQueryTextListener, OnClickReplyInterface {
 
     public static final int LOCATION_SERVICE_ENABLE = 1001;
     public static final String TAKE_ORDER = "takeOrder";
@@ -324,12 +327,14 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
         super.onCreate(savedInstanceState);
         String jsonString = FileUtils.loadSettingsJsonFile(getApplicationContext());
         if (!TextUtils.isEmpty(jsonString)) {
-            alCustomizationSettings = (AlCustomizationSettings) GsonUtils.getObjectFromJson(jsonString, AlCustomizationSettings.class);
+            alCustomizationSettings = (AlCustomizationSettings) GsonUtils.getObjectFromJson(jsonString,
+                    AlCustomizationSettings.class);
         } else {
             alCustomizationSettings = new AlCustomizationSettings();
         }
         if (!TextUtils.isEmpty(alCustomizationSettings.getChatBackgroundImageName())) {
-            resourceId = getResources().getIdentifier(alCustomizationSettings.getChatBackgroundImageName(), "drawable", getPackageName());
+            resourceId = getResources().getIdentifier(alCustomizationSettings.getChatBackgroundImageName(),
+                    "drawable", getPackageName());
         }
         if (resourceId != 0) {
             getWindow().setBackgroundDrawableResource(resourceId);
@@ -380,10 +385,11 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
                 }
                 addFragment(this, conversation, ConversationUIService.CONVERSATION_FRAGMENT);
             }
-        } else {
-            setSearchListFragment(quickConversationFragment);
-            addFragment(this, quickConversationFragment, ConversationUIService.QUICK_CONVERSATION_FRAGMENT);
         }
+// else {
+//            setSearchListFragment(quickConversationFragment);
+//            addFragment(this, quickConversationFragment, ConversationUIService.QUICK_CONVERSATION_FRAGMENT);
+//        }
         mobiComKitBroadcastReceiver = new MobiComKitBroadcastReceiver(this);
         InstructionUtil.showInfo(this, R.string.info_message_sync, BroadcastService.INTENT_ACTIONS.INSTRUCTION.toString());
 

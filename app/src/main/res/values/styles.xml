@@ -10,6 +10,37 @@ Theme.Holo.Light.DarkActionBar
 
     <style name="DemoAppTheme" parent="AppBaseTheme"></style>
 
+    <style name="FarmRiseTheme" parent="Theme.AppCompat.Light.NoActionBar">
+
+        <!--To change the toolbar color change the colorPrimary  -->
+        <item name="colorPrimary">#169947</item>
+
+        <!-- To change the status bar  color change the color of colorPrimaryDark -->
+        <item name="colorPrimaryDark">#3fb76f</item>
+
+        <!-- colorAccent is used as the default value for colorControlActivated which is used to tint widgets -->
+        <item name="colorAccent">#cca531</item>
+
+        <item name="windowActionModeOverlay">true</item>
+
+    </style>
+
+    <style name="NavigationTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+
+        <!--To change the toolbar color change the colorPrimary  -->
+        <item name="colorPrimary">#169947</item>
+
+        <!-- To change the status bar  color change the color of colorPrimaryDark -->
+        <item name="colorPrimaryDark">#3fb76f</item>
+
+        <!-- colorAccent is used as the default value for colorControlActivated which is used to tint widgets -->
+        <item name="colorAccent">#cca531</item>
+
+        <item name="windowActionModeOverlay">true</item>
+
+    </style>
+
+
     <style name="EditText">
         <item name="android:gravity">left</item>
         <item name="android:layout_gravity">center</item>

@@ -32,6 +32,12 @@ public class MobiComKitBroadcastReceiver extends BroadcastReceiver {
         this.baseContactService = new AppContactService(fragmentActivity);
     }
 
+    public MobiComKitBroadcastReceiver(FragmentActivity fragmentActivity,ConversationUIService conversationUIService) {
+        this.conversationUIService = conversationUIService;
+        this.baseContactService = new AppContactService(fragmentActivity);
+    }
+
+
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();

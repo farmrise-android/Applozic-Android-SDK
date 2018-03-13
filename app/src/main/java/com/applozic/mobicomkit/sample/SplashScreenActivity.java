@@ -22,7 +22,7 @@ public class SplashScreenActivity extends Activity {
             @Override
             public void run() {
                 if (MobiComUserPreference.getInstance(SplashScreenActivity.this).isLoggedIn()) {
-                    Intent mainIntent = new Intent(SplashScreenActivity.this, MainActivity.class);
+                    Intent mainIntent = new Intent(SplashScreenActivity.this, HomeActivity.class);
                     SplashScreenActivity.this.startActivity(mainIntent);
                     SplashScreenActivity.this.finish();
                 } else {

@@ -6,5 +6,7 @@
     <color name="buttonbgcolor">#20B2AA</color>
     <color name="textbuttoncolor">#ffffff</color>
     <color name="white">#fff</color>
+    <color name="nav_item_unSelected">#FF3FB76F</color>
+    <color name="nav_item_selected">#FF48C379</color>
 
 </resources>

@@ -29,6 +29,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="top"
         android:orientation="vertical"
-        android:visibility="gone"></LinearLayout>
+        android:visibility="gone"/>
 
 </LinearLayout>
