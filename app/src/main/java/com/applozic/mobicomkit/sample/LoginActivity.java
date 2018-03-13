@@ -299,9 +299,9 @@ public class LoginActivity extends Activity implements ActivityCompat.OnRequestP
                     buildContactData();
 
                     //starting main MainActivity
-                    Intent mainActvity = new Intent(context, MainActivity.class);
-                    startActivity(mainActvity);
-                    Intent intent = new Intent(context, ConversationActivity.class);
+//                    Intent mainActvity = new Intent(context, HomeActivity.class);
+//                    startActivity(mainActvity);
+                    Intent intent = new Intent(context, HomeActivity.class);
                     if (ApplozicClient.getInstance(LoginActivity.this).isContextBasedChat()) {
                         intent.putExtra(ConversationUIService.CONTEXT_BASED_CHAT, true);
                     }

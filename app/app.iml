@@ -160,7 +160,6 @@
     <orderEntry type="module" module-name="mobicomkitui" exported="" />
     <orderEntry type="module" module-name="mobicomkit" exported="" />
     <orderEntry type="module" module-name="mobicommons" exported="" />
-    <orderEntry type="library" exported="" name="android-android-27" level="project" />
     <orderEntry type="library" exported="" name="gson-2.8.0" level="project" />
     <orderEntry type="library" exported="" name="disklrucache-4.5.0" level="project" />
     <orderEntry type="library" exported="" name="annotations-4.5.0" level="project" />
