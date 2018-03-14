@@ -101,7 +101,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         mStacks = new HashMap<>();
         mStacks.put(TAB_HOME, new Stack<Fragment>());
         mStacks.put(TAB_CHAT, new Stack<Fragment>());
-        Applozic.init(this, "climated036533ecf63c100e720270fd3d977c5");
+        Applozic.init(this, "orphan12e5101382f0cc751fa8c224");
 
 
     }
