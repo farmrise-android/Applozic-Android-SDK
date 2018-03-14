@@ -18,7 +18,22 @@ public class FcmInstanceIDListenerService extends FirebaseInstanceIdService {
 
     @Override
     public void onTokenRefresh() {
-        super.onTokenRefresh();
+        // Get updated InstanceID token.
+        String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+
+        Applozic.getInstance(this).setDeviceRegistrationId(refreshedToken);
+
+        if (MobiComUserPreference.getInstance(this).isRegistered()) {
+            try {
+                new RegisterUserClientService(this).updatePushNotificationId(refreshedToken);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+
+      /*  super.onTokenRefresh();
 
         String registrationId = FirebaseInstanceId.getInstance().getToken();
         Log.i(TAG, "Found Registration Id:" + registrationId);
@@ -32,4 +47,4 @@ public class FcmInstanceIDListenerService extends FirebaseInstanceIdService {
         }
 
     }
-}
+}*/

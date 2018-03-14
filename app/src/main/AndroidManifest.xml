@@ -143,7 +143,7 @@
 
         <meta-data
             android:name="com.applozic.application.key"
-            android:value="climated036533ecf63c100e720270fd3d977c5" />
+            android:value="orphan12e5101382f0cc751fa8c224" />
         <meta-data
             android:name="com.applozic.server.url"
             android:value="@string/default_server_url" />

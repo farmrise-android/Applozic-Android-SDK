@@ -101,7 +101,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         mStacks = new HashMap<>();
         mStacks.put(TAB_HOME, new Stack<Fragment>());
         mStacks.put(TAB_CHAT, new Stack<Fragment>());
-        Applozic.init(this, "climated036533ecf63c100e720270fd3d977c5");
+        Applozic.init(this, "orphan12e5101382f0cc751fa8c224");
 
 
     }
@@ -332,26 +332,31 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                 activityCallbacks.put(ApplozicSetting.RequestCode.USER_LOOUT, HomeActivity.class.getName());
                 ApplozicSetting.getInstance(context).setActivityCallbacks(activityCallbacks);
 
-                //Set activity callbacks
+                if(MobiComUserPreference.getInstance(context).isRegistered()) {
+
+
+                    //Set activity callbacks
                     /*Map<ApplozicSetting.RequestCode, String> activityCallbacks = new HashMap<ApplozicSetting.RequestCode, String>();
                     activityCallbacks.put(ApplozicSetting.RequestCode.MESSAGE_TAP, MainActivity.class.getName());
                     ApplozicSetting.getInstance(context).setActivityCallbacks(activityCallbacks);*/
 
-                //Start GCM registration....
+                    //Start GCM registration....
+                    PushNotificationTask pushNotificationTask = null;
+                    PushNotificationTask.TaskListener pushNotificationTaskListener = new PushNotificationTask.TaskListener() {
+                        @Override
+                        public void onSuccess(RegistrationResponse registrationResponse) {
 
-                PushNotificationTask.TaskListener pushNotificationTaskListener = new PushNotificationTask.TaskListener() {
-                    @Override
-                    public void onSuccess(RegistrationResponse registrationResponse) {
+                        }
 
-                    }
+                        @Override
+                        public void onFailure(RegistrationResponse registrationResponse, Exception exception) {
 
-                    @Override
-                    public void onFailure(RegistrationResponse registrationResponse, Exception exception) {
-
-                    }
-                };
-                PushNotificationTask pushNotificationTask = new PushNotificationTask(Applozic.getInstance(context).getDeviceRegistrationId(), pushNotificationTaskListener, context);
-                pushNotificationTask.execute((Void) null);
+                        }
+                    };
+                     pushNotificationTask = new PushNotificationTask(
+                            Applozic.getInstance(context).getDeviceRegistrationId(), pushNotificationTaskListener, context);
+                    pushNotificationTask.execute((Void) null);
+                }
 
                 ApplozicClient.getInstance(context).hideChatListOnNotification();
                 pushFragments(TAB_CHAT, new MobiComQuickConversationFragment(), true);
@@ -375,8 +380,8 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         };
 
         User user = new User();
-        user.setUserId("9148764871");
-        user.setContactNumber("9148764871");
+        user.setUserId("skrold");
+        user.setContactNumber("9959841814");
 
         new UserLoginTask(user, listener, this).execute((Void) null);
 
