@@ -86,7 +86,7 @@
   "recordButton": true,
   "messageTemplate": {
     "isEnabled": false,
-    "borderColor": "#FF03A9F4",
+    "borderColor": "#FF2EB363",
     "backgroundColor": "#FFFFFF",
     "hideOnSend": false,
     "sendMessageOnClick": true,
