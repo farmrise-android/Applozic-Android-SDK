@@ -99,6 +99,7 @@ public class ConversationUIService {
     public static final String SEARCH_STRING = "searchString";
     public static final String CONVERSATION_ID = "CONVERSATION_ID";
     public static final String TOPIC_ID = "TOPIC_ID";
+    public static final String PROFILE_INTENT = "profile";
     private static final String TAG = "ConversationUIService";
     private static final String APPLICATION_KEY_META_DATA = "com.applozic.application.key";
     FileClientService fileClientService;

@@ -358,6 +358,7 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
         if (Utils.hasMarshmallow()) {
             applozicPermission.checkRuntimePermissionForStorage();
         }
+
         mActionBar = getSupportActionBar();
         if (!TextUtils.isEmpty(alCustomizationSettings.getThemeColorPrimary()) && !TextUtils.isEmpty(alCustomizationSettings.getThemeColorPrimaryDark())) {
             mActionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(alCustomizationSettings.getThemeColorPrimary())));
@@ -446,6 +447,11 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
 
         try {
             if (intent.getExtras() != null) {
+                if(intent.getBooleanExtra(ConversationUIService.PROFILE_INTENT,false)) {
+                    profilefragment.setApplozicPermissions(applozicPermission);
+                    addFragment(this, profilefragment, ProfileFragment.ProfileFragmentTag);
+                    return;
+                }
                 BroadcastService.setContextBasedChat(intent.getExtras().getBoolean(ConversationUIService.CONTEXT_BASED_CHAT));
                 if (BroadcastService.isIndividual() && intent.getExtras().getBoolean(MobiComKitConstants.QUICK_LIST)) {
                     setSearchListFragment(quickConversationFragment);

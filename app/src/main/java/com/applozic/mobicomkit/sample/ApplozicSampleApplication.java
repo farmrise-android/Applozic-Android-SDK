@@ -17,10 +17,13 @@ public class ApplozicSampleApplication extends MultiDexApplication {
        Fabric.with(this, new Crashlytics());
     }
 
+
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         MultiDex.install(this);
     }
+
+
 
 }
