@@ -52,16 +52,39 @@ import java.util.Stack;
 
 public class HomeActivity extends AppCompatActivity implements MessageCommunicator, MobiComKitActivityInterface {
 
-    private HashMap<String, Stack<Fragment>> mStacks;
     public static final String TAB_HOME = "tab_home";
     public static final String TAB_CHAT = "tab_chat";
-    private BottomNavigationView bottomNavigationView;
-    private String currentTab;
     private static int retry;
+    protected ActionBar mActionBar;
     ConversationUIService conversationUIService;
     MobiComQuickConversationFragment mobiComQuickConversationFragment;
     MobiComKitBroadcastReceiver mobiComKitBroadcastReceiver;
-    protected ActionBar mActionBar;
+    private HashMap<String, Stack<Fragment>> mStacks;
+    private BottomNavigationView bottomNavigationView;
+    private String currentTab;
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+            switch (item.getItemId()) {
+
+                case R.id.action_home:
+                    mStacks.get(TAB_HOME).clear();
+                    selectedTab(TAB_HOME);
+                    break;
+                case R.id.action_chat:
+                    mStacks.get(TAB_CHAT).clear();
+                    selectedTab(TAB_CHAT);
+                    break;
+
+            }
+
+            return true;
+
+        }
+    };
+    private int id = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +102,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         lastSeenStatusIntent.putExtra(UserIntentService.USER_LAST_SEEN_AT_STATUS, true);
         startService(lastSeenStatusIntent);
         mActionBar = getSupportActionBar();
-       // addFragment(this, mobiComQuickConversationFragment, ConversationUIService.QUICK_CONVERSATION_FRAGMENT); //here we are adding fragment
+        // addFragment(this, mobiComQuickConversationFragment, ConversationUIService.QUICK_CONVERSATION_FRAGMENT); //here we are adding fragment
         //Used to select an item programmatically
         //bottomNavigationView.getMenu().getItem(2).setChecked(true);
     }
@@ -105,29 +128,6 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
 
 
     }
-
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener() {
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
-            switch (item.getItemId()) {
-
-                case R.id.action_home:
-                    mStacks.get(TAB_HOME).clear();
-                    selectedTab(TAB_HOME);
-                    break;
-                case R.id.action_chat:
-                    mStacks.get(TAB_CHAT).clear();
-                    selectedTab(TAB_CHAT);
-                    break;
-
-            }
-
-            return true;
-
-        }
-    };
 
     private void selectedTab(String tabId) {
         currentTab = tabId;
@@ -207,14 +207,12 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         popFragments();
     }
 
-    private int id = 0;
+    public int getId() {
+        return id;
+    }
 
     public void setId(int newsId) {
         this.id = newsId;
-    }
-
-    public int getId() {
-        return id;
     }
 
     @Override
@@ -271,9 +269,6 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
     }
 
 
-
-
-
     /*@Override
     public void onBackPressed() {
 
@@ -319,6 +314,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mobiComKitBroadcastReceiver);
         super.onPause();
     }
+
     private void login() {
 
         UserLoginTask.TaskListener listener = new UserLoginTask.TaskListener() {
@@ -333,7 +329,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                 activityCallbacks.put(ApplozicSetting.RequestCode.USER_LOOUT, HomeActivity.class.getName());
                 ApplozicSetting.getInstance(context).setActivityCallbacks(activityCallbacks);
 
-                if(MobiComUserPreference.getInstance(context).isRegistered()) {
+                if (MobiComUserPreference.getInstance(context).isRegistered()) {
 
 
                     //Set activity callbacks
@@ -354,7 +350,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
 
                         }
                     };
-                     pushNotificationTask = new PushNotificationTask(
+                    pushNotificationTask = new PushNotificationTask(
                             Applozic.getInstance(context).getDeviceRegistrationId(), pushNotificationTaskListener, context);
                     pushNotificationTask.execute((Void) null);
                 }
@@ -384,6 +380,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         user.setUserId("skrold");
         user.setContactNumber("9959841814");
 
+
         new UserLoginTask(user, listener, this).execute((Void) null);
 
     }
@@ -391,7 +388,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         try {
-            if(requestCode == 1011) {
+            if (requestCode == 1011) {
                 Intent intent = new Intent(this, ConversationActivity.class);
                 intent.putExtra(ConversationUIService.CONVERSATION_ID, "");
                 intent.putExtra(ConversationUIService.SEARCH_STRING, "");
@@ -405,8 +402,8 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                     startActivity(intent);
                 }
             }
-          //  conversationUIService.onActivityResult(requestCode, resultCode, data);
-           // handleOnActivityResult(requestCode, data);
+            //  conversationUIService.onActivityResult(requestCode, resultCode, data);
+            // handleOnActivityResult(requestCode, data);
            /* if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
                 CropImage.ActivityResult result = CropImage.getActivityResult(data);
                 if (resultCode == RESULT_OK) {
@@ -457,7 +454,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                 break;
 
             case ProfileFragment.REQUEST_CODE_TAKE_PHOTO:
-               // beginCrop(imageUri);
+                // beginCrop(imageUri);
                 break;
 
         }

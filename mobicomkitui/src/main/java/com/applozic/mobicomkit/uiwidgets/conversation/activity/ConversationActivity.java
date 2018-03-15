@@ -359,6 +359,7 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
         if (Utils.hasMarshmallow()) {
             applozicPermission.checkRuntimePermissionForStorage();
         }
+
         mActionBar = getSupportActionBar();
         if (!TextUtils.isEmpty(alCustomizationSettings.getThemeColorPrimary()) && !TextUtils.isEmpty(alCustomizationSettings.getThemeColorPrimaryDark())) {
             mActionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(alCustomizationSettings.getThemeColorPrimary())));
