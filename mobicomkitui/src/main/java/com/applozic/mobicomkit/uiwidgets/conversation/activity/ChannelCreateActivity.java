@@ -131,8 +131,9 @@ public class ChannelCreateActivity extends AppCompatActivity implements Activity
             }
         });
 
-        int drawableResourceId = getResources().getIdentifier(alCustomizationSettings.getAttachCameraIconName(), "drawable", getPackageName());
-        uploadImageButton.setImageResource(drawableResourceId);
+        /*int drawableResourceId = getResources().getIdentifier(alCustomizationSettings.getAttachCameraIconName(),
+                "drawable", getPackageName());
+        uploadImageButton.setImageResource(drawableResourceId);*/
 
         fileClientService = new FileClientService(this);
         if (getIntent() != null) {

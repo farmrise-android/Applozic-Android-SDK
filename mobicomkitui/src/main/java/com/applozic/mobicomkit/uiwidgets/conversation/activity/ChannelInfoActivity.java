@@ -664,7 +664,8 @@ public class ChannelInfoActivity extends AppCompatActivity {
                     holder.lastSeenAtTextView.setText(getString(R.string.user_online));
                 } else if (contact.getLastSeenAt() != 0) {
                     holder.lastSeenAtTextView.setVisibility(View.VISIBLE);
-                    holder.lastSeenAtTextView.setText(getString(R.string.subtitle_last_seen_at_time) + " " + String.valueOf(DateUtils.getDateAndTimeForLastSeen(contact.getLastSeenAt())));
+                    holder.lastSeenAtTextView.setText(getString(R.string.subtitle_last_seen_at_time) + " " +
+                            String.valueOf(DateUtils.getDateAndTimeForLastSeen(contact.getLastSeenAt())));
                 } else {
                     holder.lastSeenAtTextView.setVisibility(View.GONE);
                     holder.lastSeenAtTextView.setText("");

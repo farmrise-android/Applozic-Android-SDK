@@ -417,14 +417,20 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
 
         //listView.setLongClickable(true);
 
-        recordButton.setVisibility(alCustomizationSettings.isRecordButton() && (contact != null || channel != null && !Channel.GroupType.OPEN.getValue().equals(channel.getType())) ? View.VISIBLE : View.GONE);
-        sendButton.setVisibility(alCustomizationSettings.isRecordButton() && (contact != null || channel != null && !Channel.GroupType.OPEN.getValue().equals(channel.getType())) ? View.GONE : View.VISIBLE);
+        recordButton.setVisibility(alCustomizationSettings.isRecordButton() &&
+                (contact != null || channel != null &&
+                        !Channel.GroupType.OPEN.getValue().equals(channel.getType())) ? View.VISIBLE : View.GONE);
 
-        GradientDrawable bgShape = (GradientDrawable) sendButton.getBackground();
+        sendButton.setVisibility(alCustomizationSettings.isRecordButton() &&
+                (contact != null || channel != null &&
+                        !Channel.GroupType.OPEN.getValue().equals(channel.getType())) ? View.GONE : View.VISIBLE);
+
+       /* GradientDrawable bgShape = (GradientDrawable) sendButton.getBackground();
         bgShape.setColor(Color.parseColor(alCustomizationSettings.getSendButtonBackgroundColor().trim()));
 
         GradientDrawable bgShapeRecordButton = (GradientDrawable) recordButton.getBackground();
-        bgShapeRecordButton.setColor(Color.parseColor(alCustomizationSettings.getSendButtonBackgroundColor().trim()));
+        bgShapeRecordButton.setColor(Color.parseColor
+                (alCustomizationSettings.getSendButtonBackgroundColor().trim()));*/
 
         attachButton = (ImageButton) individualMessageSendLayout.findViewById(R.id.attach_button);
 
@@ -1530,14 +1536,16 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
                             galleryImageView.setVisibility(View.GONE);
                             imageViewRLayout.setVisibility(View.GONE);
                         }
-                        imageViewForAttachmentType.setColorFilter(ContextCompat.getColor(getActivity(), R.color.apploizc_lite_gray_color));
+                        imageViewForAttachmentType.setColorFilter(ContextCompat.getColor(getActivity(),
+                                R.color.apploizc_lite_gray_color));
                     } else if (message.getContentType() == Message.ContentType.LOCATION.getValue()) {
                         imageViewForAttachmentType.setVisibility(VISIBLE);
                         galleryImageView.setVisibility(VISIBLE);
                         imageViewRLayout.setVisibility(VISIBLE);
                         messageTextView.setText(getString(R.string.al_location_string));
                         imageViewForAttachmentType.setImageResource(R.drawable.applozic_ic_location_on_white_24dp);
-                        imageViewForAttachmentType.setColorFilter(ContextCompat.getColor(getActivity(), R.color.apploizc_lite_gray_color));
+                        imageViewForAttachmentType.setColorFilter(ContextCompat.getColor(getActivity(),
+                                R.color.apploizc_lite_gray_color));
                         messageImageLoader.setLoadingImage(R.drawable.applozic_map_offline_thumbnail);
                         messageImageLoader.loadImage(LocationUtils.loadStaticMap(message.getMessage()), galleryImageView);
                     } else {
@@ -2642,7 +2650,10 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
         BroadcastService.currentUserId = null;
         BroadcastService.currentConversationId = null;
         if (typingStarted) {
-            if (contact != null | channel != null && !Channel.GroupType.OPEN.getValue().equals(channel.getType()) || contact != null) {
+            //contact != null | channel
+            if (contact != null || channel != null
+                    && !Channel.GroupType.OPEN.getValue().equals(channel.getType())
+                    || contact != null) {
                 Intent intent = new Intent(getActivity(), ApplozicMqttIntentService.class);
                 intent.putExtra(ApplozicMqttIntentService.CHANNEL, channel);
                 intent.putExtra(ApplozicMqttIntentService.CONTACT, contact);
@@ -2672,7 +2683,8 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
                     stringBufferTitle.append(withUserContact.getDisplayName());
                 }
             } else {
-                stringBufferTitle.append(ChannelUtils.getChannelTitleName(channel, MobiComUserPreference.getInstance(getActivity()).getUserId()));
+                stringBufferTitle.append(ChannelUtils.getChannelTitleName(channel,
+                        MobiComUserPreference.getInstance(getActivity()).getUserId()));
             }
         }
         if (stringBufferTitle != null) {

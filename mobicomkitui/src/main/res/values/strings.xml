@@ -153,11 +153,11 @@
     <string name="al_price">:price</string>
     <string name="current_location">Current Location</string>
     <string name="price">Price</string>
-    <string name="status">status</string>
+    <string name="status">Status</string>
     <string name="name">Name</string>
     <string name="phone">Phone</string>
     <string name="Group">GROUP</string>
-    <string name="Contact">CONTACT</string>
+    <string name="Contact">CONTACTS</string>
     <string name="participants">Participants</string>
     <string name="cancel">Cancel</string>
     <string name="Add_caption">Add caption...</string>
@@ -213,4 +213,5 @@
     <string name="profile_contact">No Contact number</string>
     <string name="profile_contact_number">Contact Number</string>
     <string name="user_name">User Name</string>
+    <string name="new_group">New group</string>
 </resources>

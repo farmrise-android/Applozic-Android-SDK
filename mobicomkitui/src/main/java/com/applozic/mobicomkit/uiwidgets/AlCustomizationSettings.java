@@ -11,11 +11,11 @@ import java.util.Map;
 public class AlCustomizationSettings extends JsonMarker {
 
 
-    public String customMessageBackgroundColor = "#FF03A9F4";
-    private String sentMessageBackgroundColor = "#FF03A9F4";
+    public String customMessageBackgroundColor = "#FF029A43";
+    private String sentMessageBackgroundColor = "#FF029A43";
     private String receivedMessageBackgroundColor = "#FFFFFFFF";
-    private String sendButtonBackgroundColor = "#FF03A9F4";
-    private String attachmentIconsBackgroundColor = "#FF03A9F4";
+    private String sendButtonBackgroundColor = "#FF029A43";
+    private String attachmentIconsBackgroundColor = "#FF029A43";
     private String chatBackgroundColorOrDrawable;
     private String editTextBackgroundColorOrDrawable;
     private String editTextLayoutBackgroundColorOrDrawable;
@@ -36,17 +36,17 @@ public class AlCustomizationSettings extends JsonMarker {
     private String messageTimeTextColor = "#838b83";
     private String channelCustomMessageTextColor = "#666666";
 
-    private String sentMessageBorderColor = "#FF03A9F4";
+    private String sentMessageBorderColor = "#FF029A43";
     private String receivedMessageBorderColor = "#FFFFFFFF";
     private String channelCustomMessageBorderColor = "#cccccc";
-    private String collapsingToolbarLayoutColor = "#FF03A9F4";
-    private String groupParticipantsTextColor = "#FF03A9F4";
-    private String groupDeleteButtonBackgroundColor = "#FF03A9F4";
-    private String groupExitButtonBackgroundColor = "#FF03A9F4";
-    private String adminTextColor = "#FF03A9F4";
+    private String collapsingToolbarLayoutColor = "#FF029A43";
+    private String groupParticipantsTextColor = "#FF029A43";
+    private String groupDeleteButtonBackgroundColor = "#FF029A43";
+    private String groupExitButtonBackgroundColor = "#FF029A43";
+    private String adminTextColor = "#FF029A43";
     private String adminBackgroundColor = "#FFFFFFFF";
     private String attachCameraIconName = "applozic_ic_action_camera_new";
-    private String adminBorderColor = "#FF03A9F4";
+    private String adminBorderColor = "#FF029A43";
     private String userNotAbleToChatTextColor = "#000000";
     private String chatBackgroundImageName;
 

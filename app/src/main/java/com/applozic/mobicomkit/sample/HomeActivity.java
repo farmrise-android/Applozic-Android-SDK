@@ -320,6 +320,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         super.onPause();
     }
     private void login() {
+
         UserLoginTask.TaskListener listener = new UserLoginTask.TaskListener() {
 
             @Override
@@ -381,7 +382,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
 
         User user = new User();
         user.setUserId("skrold");
-        user.setContactNumber("9959841814"); 
+        user.setContactNumber("9959841814");
 
         new UserLoginTask(user, listener, this).execute((Void) null);
 

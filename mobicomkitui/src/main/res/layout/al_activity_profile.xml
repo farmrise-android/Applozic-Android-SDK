@@ -81,6 +81,7 @@
                 android:paddingRight="10dp"
                 android:paddingEnd="10dp"
                 android:paddingLeft="10dp">
+
                 <RelativeLayout
                     android:id="@+id/applozic_profile_displayname_verticalline_rl"
                     android:layout_width="2dp"
@@ -218,6 +219,7 @@
                     android:layout_marginRight="18dp"
                     android:text=""
                     android:visibility="gone" />
+
             </RelativeLayout>
 
 

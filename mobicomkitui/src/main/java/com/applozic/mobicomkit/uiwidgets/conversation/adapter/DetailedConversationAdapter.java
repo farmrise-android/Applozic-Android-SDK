@@ -425,10 +425,14 @@ public class DetailedConversationAdapter extends RecyclerView.Adapter implements
                                 myHolder.imageViewPhoto.setVisibility(View.VISIBLE);
                                 myHolder.imageViewRLayout.setVisibility(View.VISIBLE);
                                 myHolder.replyMessageTextView.setText(context.getString(R.string.al_location_string));
-                                myHolder.imageViewForAttachmentType.setColorFilter(Color.parseColor(message.isTypeOutbox() ? alCustomizationSettings.getSentMessageTextColor() : alCustomizationSettings.getReceivedMessageTextColor()));
+                                myHolder.imageViewForAttachmentType.setColorFilter
+                                        (Color.parseColor(message.isTypeOutbox() ?
+                                                alCustomizationSettings.getSentMessageTextColor()
+                                                : alCustomizationSettings.getReceivedMessageTextColor()));
                                 myHolder.imageViewForAttachmentType.setImageResource(R.drawable.applozic_ic_location_on_white_24dp);
                                 loadImage.setLoadingImage(R.drawable.applozic_map_offline_thumbnail);
-                                loadImage.loadImage(LocationUtils.loadStaticMap(msg.getMessage()), myHolder.imageViewPhoto);
+                                loadImage.loadImage(LocationUtils.loadStaticMap(msg.getMessage()),
+                                        myHolder.imageViewPhoto);
                             } else {
                                 myHolder.imageViewForAttachmentType.setVisibility(View.GONE);
                                 myHolder.imageViewRLayout.setVisibility(View.GONE);
@@ -536,7 +540,8 @@ public class DetailedConversationAdapter extends RecyclerView.Adapter implements
                         }
 
                         if (message.isCall()) {
-                            myHolder.messageTextView.setTextColor(context.getResources().getColor(message.isIncomingCall() ? R.color.incoming_call : R.color.outgoing_call));
+                            myHolder.messageTextView.setTextColor(context.getResources().getColor(message.isIncomingCall()
+                                    ? R.color.incoming_call : R.color.outgoing_call));
                         }
                     }
 
@@ -1023,11 +1028,13 @@ public class DetailedConversationAdapter extends RecyclerView.Adapter implements
             /*alphabeticTextView.setTextColor(context.getResources().getColor(AlphaNumberColorUtil.alphabetTextColorMap.get(colorKey)));
             alphabeticTextView.setBackgroundResource(AlphaNumberColorUtil.alphabetBackgroundColorMap.get(colorKey));*/
             GradientDrawable bgShape = (GradientDrawable) alphabeticTextView.getBackground();
-            bgShape.setColor(context.getResources().getColor(AlphaNumberColorUtil.alphabetBackgroundColorMap.get(colorKey)));
+            bgShape.setColor(context.getResources().getColor
+                    (AlphaNumberColorUtil.alphabetBackgroundColorMap.get(colorKey)));
         }
 
         if (contact != null && contact.isDrawableResources() && contactImage != null) {
-            int drawableResourceId = context.getResources().getIdentifier(contact.getrDrawableName(), "drawable", context.getPackageName());
+            int drawableResourceId = context.getResources().getIdentifier(contact.getrDrawableName(),
+                    "drawable", context.getPackageName());
             contactImage.setImageResource(drawableResourceId);
             contactImage.setVisibility(View.VISIBLE);
             alphabeticTextView.setVisibility(View.GONE);

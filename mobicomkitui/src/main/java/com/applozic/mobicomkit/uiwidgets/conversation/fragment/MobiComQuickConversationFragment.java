@@ -8,8 +8,10 @@ import android.os.Bundle;
 import android.os.Process;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -45,6 +47,7 @@ import com.applozic.mobicomkit.uiwidgets.conversation.AlLinearLayoutManager;
 import com.applozic.mobicomkit.uiwidgets.conversation.ConversationUIService;
 import com.applozic.mobicomkit.uiwidgets.conversation.activity.ChannelCreateActivity;
 import com.applozic.mobicomkit.uiwidgets.conversation.activity.ContactSelectionActivity;
+import com.applozic.mobicomkit.uiwidgets.conversation.activity.ConversationActivity;
 import com.applozic.mobicomkit.uiwidgets.conversation.activity.DividerItemDecoration;
 import com.applozic.mobicomkit.uiwidgets.conversation.activity.MobiComKitActivityInterface;
 import com.applozic.mobicomkit.uiwidgets.conversation.activity.RecyclerViewPositionHelper;
@@ -67,7 +70,7 @@ import java.util.Map;
 /**
  * Created by devashish on 10/2/15.
  */
-public class MobiComQuickConversationFragment extends Fragment implements SearchListFragment {
+public class MobiComQuickConversationFragment extends Fragment implements SearchListFragment, SearchView.OnQueryTextListener {
 
     public static final String QUICK_CONVERSATION_EVENT = "quick_conversation";
     protected RecyclerView recyclerView = null;
@@ -75,6 +78,7 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
     private RelativeLayout noConversations;
     //protected TextView emptyTextView;
     protected Button startNewButton;
+    private SearchView searchView;
     protected SwipeRefreshLayout swipeLayout;
     protected int listIndex;
     protected Map<String, Message> latestMessageForEachContact = new HashMap<String, Message>();
@@ -110,9 +114,12 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         String jsonString = FileUtils.loadSettingsJsonFile(getActivity().getApplicationContext());
+
         if (!TextUtils.isEmpty(jsonString)) {
-            alCustomizationSettings = (AlCustomizationSettings) GsonUtils.getObjectFromJson(jsonString, AlCustomizationSettings.class);
+            alCustomizationSettings = (AlCustomizationSettings)
+                    GsonUtils.getObjectFromJson(jsonString, AlCustomizationSettings.class);
         } else {
             alCustomizationSettings = new AlCustomizationSettings();
         }
@@ -120,6 +127,7 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
         conversationUIService = new ConversationUIService(getActivity());
         baseContactService = new AppContactService(getActivity());
         messageDatabaseService = new MessageDatabaseService(getActivity());
+
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -157,6 +165,8 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
         //recyclerView.addItemDecoration(new FooterItemDecoration(getContext(), recyclerView, R.layout.mobicom_message_list_header_footer));
         toolbar = (Toolbar) list.findViewById(R.id.my_toolbar);
         //toolbar.setClickable(false);
+
+        toolbar.setVisibility(View.VISIBLE);
 
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         if (activity != null) {
@@ -237,10 +247,23 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
 
         toolbar.inflateMenu(R.menu.mobicom_basic_menu_for_normal_message);
 
-        if (alCustomizationSettings.isStartNewButton() || ApplozicSetting.getInstance(getContext()).isStartNewButtonVisible()) {
+        MenuItem searchItem = menu.findItem(R.id.menu_search);
+        searchItem.setVisible(true);
+        searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setQueryHint(getResources().getString(R.string.search_hint));
+        if (Utils.hasICS()) {
+            searchItem.collapseActionView();
+        }
+        searchView.setOnQueryTextListener(this);
+        searchView.setSubmitButtonEnabled(true);
+        searchView.setIconified(true);
+
+        if (alCustomizationSettings.isStartNewButton() ||
+                ApplozicSetting.getInstance(getContext()).isStartNewButtonVisible()) {
             menu.findItem(R.id.start_new).setVisible(true);
         }
-        if (alCustomizationSettings.isStartNewGroup() || ApplozicSetting.getInstance(getContext()).isStartNewGroupButtonVisible()) {
+        if (alCustomizationSettings.isStartNewGroup() ||
+                ApplozicSetting.getInstance(getContext()).isStartNewGroupButtonVisible()) {
             menu.findItem(R.id.conversations).setVisible(true);
         }
         if (alCustomizationSettings.isRefreshOption()) {
@@ -252,9 +275,9 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
         if (alCustomizationSettings.isMessageSearchOption()) {
             menu.findItem(R.id.menu_search).setVisible(true);
         }
-        if (alCustomizationSettings.isBroadcastOption()) {
+        /*if (alCustomizationSettings.isBroadcastOption()) {
             menu.findItem(R.id.broadcast).setVisible(true);
-        }
+        }*/
         if (alCustomizationSettings.isLogoutOption()) {
             menu.findItem(R.id.logout).setVisible(true);
         }
@@ -554,7 +577,7 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
     public void onResume() {
         //Assigning to avoid notification in case if quick conversation fragment is opened....
         toolbar.setTitle(getResources().getString(R.string.chats));
-        toolbar.setSubtitle("");
+        //toolbar.setSubtitle("");
         BroadcastService.selectMobiComKitAll();
         super.onResume();
         if (recyclerView != null) {
@@ -714,6 +737,12 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        //this.searchTerm = query;
+        return false;
     }
 
     @Override
@@ -968,11 +997,11 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
             Intent intent = new Intent(getActivity(), ChannelCreateActivity.class);
             intent.putExtra(ChannelCreateActivity.GROUP_TYPE, Channel.GroupType.PUBLIC.getValue().intValue());
             startActivity(intent);
-        } else if (id == R.id.broadcast) {
+        } /*else if (id == R.id.broadcast) {
             Intent intent = new Intent(getActivity(), ContactSelectionActivity.class);
             intent.putExtra(ContactSelectionActivity.GROUP_TYPE, Channel.GroupType.BROADCAST.getValue().intValue());
             startActivity(intent);
-        } else if (id == R.id.refresh) {
+        } */else if (id == R.id.refresh) {
             Toast.makeText(getActivity(), getString(R.string.info_message_sync), Toast.LENGTH_LONG).show();
             //new ConversationActivity.SyncMessagesAsyncTask(this).execute();
         } else if (id == R.id.shareOptions) {
@@ -982,6 +1011,13 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
             startActivity(Intent.createChooser(intent, "Share Via"));
             return super.onOptionsItemSelected(item);
         } else if (id == R.id.applozicUserProfile) {
+
+            Intent intent = new Intent(getActivity(), ConversationActivity.class);
+            intent.putExtra(ConversationUIService.SEARCH_STRING, searchString);
+            intent.putExtra(ConversationUIService.TAKE_ORDER, true);
+            intent.putExtra(ConversationUIService.PROFILE_INTENT, true);
+            startActivity(intent);
+
             //profilefragment.setApplozicPermissions(applozicPermission);
             //addFragment(this, profilefragment, ProfileFragment.ProfileFragmentTag);
         } /*else if (id == R.id.logout) {

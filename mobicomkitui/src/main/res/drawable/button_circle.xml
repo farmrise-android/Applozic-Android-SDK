@@ -3,6 +3,12 @@
     android:shape="oval">
     <gradient
         android:angle="270"
-        android:endColor="@color/applozic_theme_color_control_activated"
-        android:startColor="@color/applozic_theme_color_control_highlight" />
+        android:startColor="#3fb76f"
+        android:endColor="#169947" />
+
+    <!--android:startColor="@color/applozic_theme_color_control_highlight"
+    android:endColor="@color/applozic_theme_color_control_activated"
+-->
+
+
 </shape>

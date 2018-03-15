@@ -15,42 +15,42 @@
         mobicomkit:iconifiedByDefault="true"
         mobicomkit:showAsAction="always" />
 
-
-    <item
-        android:id="@+id/conversations"
-        android:icon="@drawable/applozic_ic_action_chat"
-        android:orderInCategory="2"
-        android:showAsAction="ifRoom"
-        android:title="@string/conversation"
-        android:visible="false"
-        mobicomkit:showAsAction="ifRoom" />
-
     <item
         android:id="@+id/start_new"
-        android:icon="@drawable/applozic_ic_action_add"
-        android:orderInCategory="3"
-        android:showAsAction="ifRoom|collapseActionView"
+        android:icon="@drawable/new_chat"
+        android:orderInCategory="2"
+        android:showAsAction="always"
         android:title="@string/start_New"
         android:visible="false"
-        mobicomkit:showAsAction="ifRoom|collapseActionView" />
-
-    <item
-        android:id="@+id/dial"
-        android:icon="@drawable/applozic_ic_action_call"
-        android:orderInCategory="4"
-        android:showAsAction="ifRoom|collapseActionView"
-        android:title="@string/dial"
-        android:visible="false"
-        mobicomkit:showAsAction="ifRoom|collapseActionView" />
+        mobicomkit:showAsAction="always" />
 
     <item
         android:id="@+id/refresh"
         android:icon="@drawable/applozic_ic_action_time"
-        android:orderInCategory="5"
+        android:orderInCategory="3"
         android:showAsAction="collapseActionView"
         android:title="@string/refresh"
         android:visible="false"
         mobicomkit:showAsAction="collapseActionView" />
+
+    <item
+        android:id="@+id/applozicUserProfile"
+        android:orderInCategory="4"
+        android:showAsAction="collapseActionView"
+        android:title="@string/applozic_my_profile_option_info"
+        android:visible="false"
+        mobicomkit:showAsAction="collapseActionView" />
+
+
+    <item
+        android:id="@+id/conversations"
+        android:icon="@drawable/applozic_ic_action_chat"
+        android:orderInCategory="5"
+        android:showAsAction="ifRoom"
+        android:title="@string/new_group"
+        android:visible="false"
+        mobicomkit:showAsAction="ifRoom" />
+
 
     <item
         android:id="@+id/deleteConversation"
@@ -61,24 +61,6 @@
         android:visible="false"
         mobicomkit:showAsAction="collapseActionView" />
 
-    <item
-        android:id="@+id/shareOptions"
-        android:actionProviderClass="android.support.v7.widget.ShareActionProvider"
-        android:icon="@drawable/mobicom_social_share"
-        android:orderInCategory="10"
-        android:showAsAction="collapseActionView"
-        android:title="@string/shareOptions"
-        android:visible="false"
-        mobicomkit:showAsAction="collapseActionView" />
-
-    <item
-        android:id="@+id/video_call"
-        android:icon="@drawable/ic_videocam_white_24px"
-        android:orderInCategory="3"
-        android:padding="8dp"
-        android:title="@string/video_string"
-        android:visible="false"
-        mobicomkit:showAsAction="ifRoom|collapseActionView" />
 
     <item
         android:id="@+id/userBlock"
@@ -94,21 +76,50 @@
         android:title="@string/user_un_block"
         android:visible="false"
         mobicomkit:showAsAction="collapseActionView" />
+
+
+
     <item
-        android:id="@+id/applozicUserProfile"
-        android:orderInCategory="2"
+        android:id="@+id/dial"
+        android:icon="@drawable/applozic_ic_action_call"
+        android:orderInCategory="12"
+        android:showAsAction="ifRoom|collapseActionView"
+        android:title="@string/dial"
+        android:visible="false"
+        mobicomkit:showAsAction="ifRoom|collapseActionView" />
+
+
+
+
+    <item
+        android:id="@+id/shareOptions"
+        android:actionProviderClass="android.support.v7.widget.ShareActionProvider"
+        android:icon="@drawable/mobicom_social_share"
+        android:orderInCategory="10"
         android:showAsAction="collapseActionView"
-        android:title="@string/applozic_my_profile_option_info"
+        android:title="@string/shareOptions"
         android:visible="false"
         mobicomkit:showAsAction="collapseActionView" />
 
     <item
+        android:id="@+id/video_call"
+        android:icon="@drawable/ic_videocam_white_24px"
+        android:orderInCategory="8"
+        android:padding="8dp"
+        android:title="@string/video_string"
+        android:visible="false"
+        mobicomkit:showAsAction="ifRoom|collapseActionView" />
+
+
+
+
+    <!--<item
         android:id="@+id/broadcast"
         android:orderInCategory="8"
         android:showAsAction="ifRoom"
         android:title="@string/new_broadcast_name_info"
         android:visible="false"
-        mobicomkit:showAsAction="collapseActionView" />
+        mobicomkit:showAsAction="collapseActionView" />-->
 
     <item
         android:id="@+id/muteGroup"
@@ -117,6 +128,7 @@
         android:title="@string/mute_Group"
         android:visible="false"
         mobicomkit:showAsAction="collapseActionView" />
+
     <item
         android:id="@+id/unmuteGroup"
         android:orderInCategory="9"

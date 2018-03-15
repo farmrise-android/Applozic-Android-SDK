@@ -56,10 +56,12 @@ public class MobicomMultimediaPopupAdapter extends BaseAdapter {
         TextView icon = (TextView) convertView.findViewById(R.id.mobicom_multimedia_icon);
         Typeface iconTypeface = Typeface.createFromAsset(context.getAssets(), "fonts/fontawesome-webfont.ttf");
         icon.setTypeface(iconTypeface);
+
         TextView text = (TextView) convertView.findViewById(R.id.mobicom_multimedia_text);
         icon.setTextColor(Color.parseColor(alCustomizationSettings.getAttachmentIconsBackgroundColor()));
         icon.setText(multimediaIcons.get(position));
         text.setText(multimediaText.get(position));
+
         return convertView;
     }
 

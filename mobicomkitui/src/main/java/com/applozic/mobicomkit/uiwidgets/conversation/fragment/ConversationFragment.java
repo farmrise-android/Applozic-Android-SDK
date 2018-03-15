@@ -135,7 +135,8 @@ public class ConversationFragment extends MobiComConversationFragment implements
 
                 if (channel != null) {
                     if (Channel.GroupType.GROUPOFTWO.getValue().equals(channel.getType())) {
-                        String userId = ChannelService.getInstance(getActivity()).getGroupOfTwoReceiverUserId(channel.getKey());
+                        String userId = ChannelService.getInstance(getActivity()).
+                                getGroupOfTwoReceiverUserId(channel.getKey());
                         if (!TextUtils.isEmpty(userId)) {
                             Contact withUserContact = appContactService.getContactById(userId);
                             if (withUserContact.isBlocked()) {
@@ -187,7 +188,8 @@ public class ConversationFragment extends MobiComConversationFragment implements
 
 
     void processAttachButtonClick(View view) {
-        MobicomMultimediaPopupAdapter mobicomMultimediaPopupAdapter = new MobicomMultimediaPopupAdapter(getActivity(), attachmentIcon, attachmentText);
+        MobicomMultimediaPopupAdapter mobicomMultimediaPopupAdapter = new MobicomMultimediaPopupAdapter
+                (getActivity(), attachmentIcon, attachmentText);
         mobicomMultimediaPopupAdapter.setAlCustomizationSettings(alCustomizationSettings);
         multimediaPopupGrid.setAdapter(mobicomMultimediaPopupAdapter);
 

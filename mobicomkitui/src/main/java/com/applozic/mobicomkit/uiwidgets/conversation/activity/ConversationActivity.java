@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
@@ -446,7 +447,15 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
 
         try {
             if (intent.getExtras() != null) {
-                BroadcastService.setContextBasedChat(intent.getExtras().getBoolean(ConversationUIService.CONTEXT_BASED_CHAT));
+
+                if(intent.getBooleanExtra(ConversationUIService.PROFILE_INTENT,false)) {
+                    profilefragment.setApplozicPermissions(applozicPermission);
+                    addFragment(this, profilefragment, ProfileFragment.ProfileFragmentTag);
+                    return;
+                }
+
+                BroadcastService.setContextBasedChat(intent.getExtras().
+                        getBoolean(ConversationUIService.CONTEXT_BASED_CHAT));
                 if (BroadcastService.isIndividual() && intent.getExtras().getBoolean(MobiComKitConstants.QUICK_LIST)) {
                     setSearchListFragment(quickConversationFragment);
                     addFragment(this, quickConversationFragment, ConversationUIService.QUICK_CONVERSATION_FRAGMENT);
@@ -556,7 +565,7 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PermissionsUtils.REQUEST_STORAGE) {
             if (PermissionsUtils.verifyPermissions(grantResults)) {
                 showSnackBar(R.string.storage_permission_granted);
@@ -714,11 +723,11 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
             Intent intent = new Intent(this, ChannelCreateActivity.class);
             intent.putExtra(ChannelCreateActivity.GROUP_TYPE, Channel.GroupType.PUBLIC.getValue().intValue());
             startActivity(intent);
-        } else if (id == R.id.broadcast) {
+        } /*else if (id == R.id.broadcast) {
             Intent intent = new Intent(this, ContactSelectionActivity.class);
             intent.putExtra(ContactSelectionActivity.GROUP_TYPE, Channel.GroupType.BROADCAST.getValue().intValue());
             startActivity(intent);
-        } else if (id == R.id.refresh) {
+        }*/ else if (id == R.id.refresh) {
             Toast.makeText(this, getString(R.string.info_message_sync), Toast.LENGTH_LONG).show();
             new SyncMessagesAsyncTask(this).execute();
         } else if (id == R.id.shareOptions) {

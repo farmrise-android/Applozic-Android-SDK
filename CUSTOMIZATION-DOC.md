@@ -12,10 +12,10 @@ Applozic provide easy settings to customise your ui themes color, pop-up message
   
 | Properites | Sample Value | Description |
 | ---------- | ------| ----------- |
-| sentMessageBackgroundColor | Color hex (#FF03A9F4) |  Sent message chat bubble color |
+| sentMessageBackgroundColor | Color hex (#FF029A43) |  Sent message chat bubble color |
 | receivedMessageBackgroundColor| Color hex (#FFFFFFFF) | Received message chat bubble color |
-| sendButtonBackgroundColor | Color hex (#FF03A9F4) | Send button background color |
-| attachmentIconsBackgroundColor | Color hex (#FF03A9F4) |Attachment icons background color |
+| sendButtonBackgroundColor | Color hex (#FF029A43) | Send button background color |
+| attachmentIconsBackgroundColor | Color hex (#FF029A43) |Attachment icons background color |
 | channelCustomMessageBgColor | Color hex (#cccccc) | Group add,remove,left message background color |
 | sentContactMessageTextColor | Color hex (#FFFFFFFF) | Sent contact message text color |
 | receivedContactMessageTextColor| Color hex (#000000)|Received contact message text color |
@@ -30,7 +30,7 @@ Applozic provide easy settings to customise your ui themes color, pop-up message
 | conversationDayTextColor | Color hex  (#333333) | Message day text color |
 | messageTimeTextColor | Color hex  (#838b83) |    Message time text color |
 | channelCustomMessageTextColor | Color hex (#666666) |  Group add,remove,left message text color |
-| sentMessageBorderColor | Color hex  (#FF03A9F4) |Sent Message chat bubble border color |
+| sentMessageBorderColor | Color hex  (#FF029A43) |Sent Message chat bubble border color |
 | receivedMessageBorderColor | Color hex  (#FFFFFFFF )| Received message chat bubble border color |
 | channelCustomMessageBorderColor | Color hex  (#cccccc) |Group add,remove,left message border color |
 | noConversationLabel| String | No  conversation text label |

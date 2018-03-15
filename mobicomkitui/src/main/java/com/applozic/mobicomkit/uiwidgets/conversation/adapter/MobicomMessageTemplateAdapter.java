@@ -3,6 +3,7 @@ package com.applozic.mobicomkit.uiwidgets.conversation.adapter;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -34,15 +35,16 @@ public class MobicomMessageTemplateAdapter extends RecyclerView.Adapter<MobicomM
         this.messageMap = messageTemplate.getMessages();
     }
 
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.mobicom_message_template_item, parent, false);
         return new ViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         holder.messageText.setText(messageList.get(position));
         holder.messageText.setTextColor(Color.parseColor(messageTemplate.getTextColor()));
         holder.messageText.setBackgroundDrawable(getShape(holder.messageText.getContext()));

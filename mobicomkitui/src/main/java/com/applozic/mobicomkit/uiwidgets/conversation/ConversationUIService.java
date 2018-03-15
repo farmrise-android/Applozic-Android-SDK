@@ -110,6 +110,7 @@ public class ConversationUIService {
     private Contact contact;
     private NotificationManager notificationManager;
     MobiComQuickConversationFragment mobiComQuickConversationFragment;
+    public static final String PROFILE_INTENT = "profile";
 
 
     public ConversationUIService(FragmentActivity fragmentActivity) {
@@ -119,7 +120,6 @@ public class ConversationUIService {
         this.notificationManager = (NotificationManager) fragmentActivity.getSystemService(Context.NOTIFICATION_SERVICE);
         this.fileClientService = new FileClientService(fragmentActivity);
     }
-
 
     public ConversationUIService(FragmentActivity fragmentActivity,MobiComQuickConversationFragment mobiComQuickConversationFragment) {
         this.fragmentActivity = fragmentActivity;

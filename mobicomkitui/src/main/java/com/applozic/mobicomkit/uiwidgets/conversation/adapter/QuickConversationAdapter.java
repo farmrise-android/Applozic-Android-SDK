@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.GradientDrawable;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -125,7 +126,7 @@ public class QuickConversationAdapter extends RecyclerView.Adapter implements Fi
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         if (viewType == 2) {
             View v2 = inflater.inflate(R.layout.mobicom_message_list_header_footer, parent, false);
@@ -217,7 +218,8 @@ public class QuickConversationAdapter extends RecyclerView.Adapter implements Fi
                     createVideoCallView(message, myholder.attachmentIcon, myholder.messageTextView);
                 } else if (message.hasAttachment() && myholder.attachmentIcon != null && !(message.getContentType() == Message.ContentType.TEXT_URL.getValue())) {
                     //Todo: handle it for fileKeyStrings when filePaths is empty
-                    String filePath = message.getFileMetas() == null && message.getFilePaths() != null ? message.getFilePaths().get(0).substring(message.getFilePaths().get(0).lastIndexOf("/") + 1) :
+                    String filePath = message.getFileMetas() == null && message.getFilePaths() != null
+                            ? message.getFilePaths().get(0).substring(message.getFilePaths().get(0).lastIndexOf("/") + 1) :
                             message.getFileMetas() != null ? message.getFileMetas().getName() : "";
                     myholder.attachmentIcon.setVisibility(View.VISIBLE);
                     myholder.attachmentIcon.setImageResource(R.drawable.applozic_ic_action_attachment);
