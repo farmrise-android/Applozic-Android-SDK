@@ -111,7 +111,6 @@ public class ConversationUIService {
     private Contact contact;
     private NotificationManager notificationManager;
     MobiComQuickConversationFragment mobiComQuickConversationFragment;
-    public static final String PROFILE_INTENT = "profile";
 
 
     public ConversationUIService(FragmentActivity fragmentActivity) {
