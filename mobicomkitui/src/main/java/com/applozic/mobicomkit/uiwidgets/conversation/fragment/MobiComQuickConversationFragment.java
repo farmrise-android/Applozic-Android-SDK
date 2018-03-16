@@ -1016,8 +1016,6 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
                             Log.d("emptyTextViewEmptyNo", "emptyTextViewEmptyNo");
                         }
 
-
-
                         Log.d("emptyTextView5", "emptyTextView5");
 
                         if (!TextUtils.isEmpty(searchString) && messageList.isEmpty()) {
