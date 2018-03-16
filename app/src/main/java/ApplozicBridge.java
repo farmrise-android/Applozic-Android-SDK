@@ -145,7 +145,7 @@ public class ApplozicBridge {
     }
 
     /**
-     * Method to get the  Email Id  from google primary account
+     * Method to get the Email Id from google primary account
      *
      * @param context
      * @return

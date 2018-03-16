@@ -101,6 +101,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         Intent lastSeenStatusIntent = new Intent(this, UserIntentService.class);
         lastSeenStatusIntent.putExtra(UserIntentService.USER_LAST_SEEN_AT_STATUS, true);
         startService(lastSeenStatusIntent);
+
         mActionBar = getSupportActionBar();
         // addFragment(this, mobiComQuickConversationFragment, ConversationUIService.QUICK_CONVERSATION_FRAGMENT); //here we are adding fragment
         //Used to select an item programmatically
@@ -143,11 +144,13 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                 pushFragments(tabId, new HomeFragment(), true);
                 break;
             case TAB_CHAT:
-                if (MobiComUserPreference.getInstance(this).isLoggedIn()) {
+               /* if (MobiComUserPreference.getInstance(this).isLoggedIn()) {
                     pushFragments(tabId, new MobiComQuickConversationFragment(), true);
                 } else {
                     login();
-                }
+                }*/
+
+               login();
                 break;
         }
         /*} else {
@@ -166,7 +169,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         FragmentTransaction ft = manager.beginTransaction();
         ft.replace(R.id.container, fragment);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-//        ft.addToBackStack(null);
+        //ft.addToBackStack(null);
         ft.commit();
     }
 
@@ -331,10 +334,10 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
 
                 if (MobiComUserPreference.getInstance(context).isRegistered()) {
 
-
+/*
                     //Set activity callbacks
-                    /*Map<ApplozicSetting.RequestCode, String> activityCallbacks = new HashMap<ApplozicSetting.RequestCode, String>();
-                    activityCallbacks.put(ApplozicSetting.RequestCode.MESSAGE_TAP, MainActivity.class.getName());
+                    Map<ApplozicSetting.RequestCode, String> activityCallbacks = new HashMap<ApplozicSetting.RequestCode, String>();
+                    activityCallbacks.put(ApplozicSetting.RequestCode.MESSAGE_TAP, HomeActivity.class.getName());
                     ApplozicSetting.getInstance(context).setActivityCallbacks(activityCallbacks);*/
 
                     //Start GCM registration....
@@ -377,8 +380,8 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         };
 
         User user = new User();
-        user.setUserId("skrold");
-        user.setContactNumber("9959841814");
+        user.setUserId("mon2");
+        user.setContactNumber("9292929292");
 
 
         new UserLoginTask(user, listener, this).execute((Void) null);

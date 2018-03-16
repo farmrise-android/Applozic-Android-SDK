@@ -21,7 +21,7 @@ public class SplashScreenActivity extends Activity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (MobiComUserPreference.getInstance(SplashScreenActivity.this).isLoggedIn()) {
+               /* if (MobiComUserPreference.getInstance(SplashScreenActivity.this).isLoggedIn()) {
                     Intent mainIntent = new Intent(SplashScreenActivity.this, HomeActivity.class);
                     SplashScreenActivity.this.startActivity(mainIntent);
                     SplashScreenActivity.this.finish();
@@ -29,7 +29,13 @@ public class SplashScreenActivity extends Activity {
                     Intent mainIntent = new Intent(SplashScreenActivity.this, LoginActivity.class);
                     SplashScreenActivity.this.startActivity(mainIntent);
                     SplashScreenActivity.this.finish();
-                }
+                }*/
+                Intent mainIntent = new Intent(SplashScreenActivity.this, HomeActivity.class);
+                SplashScreenActivity.this.startActivity(mainIntent);
+                SplashScreenActivity.this.finish();
+
+
+
             }
         }, SPLASH_DISPLAY_LENGTH);
     }
