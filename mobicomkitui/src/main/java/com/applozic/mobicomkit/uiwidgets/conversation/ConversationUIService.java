@@ -129,6 +129,8 @@ public class ConversationUIService {
         this.userPreference = MobiComUserPreference.getInstance(fragmentActivity);
     }
 
+
+
 //    public MobiComQuickConversationFragment getQuickConversationFragment() {
 //
 //        MobiComQuickConversationFragment quickConversationFragment = (MobiComQuickConversationFragment) UIService.getFragmentByTag(fragmentActivity, QUICK_CONVERSATION_FRAGMENT);

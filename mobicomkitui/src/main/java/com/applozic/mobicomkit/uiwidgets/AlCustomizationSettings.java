@@ -40,7 +40,7 @@ public class AlCustomizationSettings extends JsonMarker {
     private String receivedMessageBorderColor = "#FFFFFFFF";
     private String channelCustomMessageBorderColor = "#cccccc";
     private String collapsingToolbarLayoutColor = "#FF029A43";
-    private String groupParticipantsTextColor = "#FF029A43";
+    private String groupParticipantsTextColor = "#000000"; //#FF029A43
     private String groupDeleteButtonBackgroundColor = "#FF029A43";
     private String groupExitButtonBackgroundColor = "#FF029A43";
     private String adminTextColor = "#FF029A43";

@@ -427,8 +427,8 @@ public class DetailedConversationAdapter extends RecyclerView.Adapter implements
                                 myHolder.replyMessageTextView.setText(context.getString(R.string.al_location_string));
                                 myHolder.imageViewForAttachmentType.setColorFilter
                                         (Color.parseColor(message.isTypeOutbox() ?
-                                                alCustomizationSettings.getSentMessageTextColor()
-                                                : alCustomizationSettings.getReceivedMessageTextColor()));
+                                                alCustomizationSettings.getSentMessageTextColor() :
+                                                alCustomizationSettings.getReceivedMessageTextColor()));
                                 myHolder.imageViewForAttachmentType.setImageResource(R.drawable.applozic_ic_location_on_white_24dp);
                                 loadImage.setLoadingImage(R.drawable.applozic_map_offline_thumbnail);
                                 loadImage.loadImage(LocationUtils.loadStaticMap(msg.getMessage()),
@@ -1028,8 +1028,8 @@ public class DetailedConversationAdapter extends RecyclerView.Adapter implements
             /*alphabeticTextView.setTextColor(context.getResources().getColor(AlphaNumberColorUtil.alphabetTextColorMap.get(colorKey)));
             alphabeticTextView.setBackgroundResource(AlphaNumberColorUtil.alphabetBackgroundColorMap.get(colorKey));*/
             GradientDrawable bgShape = (GradientDrawable) alphabeticTextView.getBackground();
-            bgShape.setColor(context.getResources().getColor
-                    (AlphaNumberColorUtil.alphabetBackgroundColorMap.get(colorKey)));
+            bgShape.setColor(context.getResources().getColor(
+                    AlphaNumberColorUtil.alphabetBackgroundColorMap.get(colorKey)));
         }
 
         if (contact != null && contact.isDrawableResources() && contactImage != null) {
@@ -1048,7 +1048,8 @@ public class DetailedConversationAdapter extends RecyclerView.Adapter implements
         }
 
         if (contactDisplayName != null && contactDisplayName.isDrawableResources() && contactImage != null) {
-            int drawableResourceId = context.getResources().getIdentifier(contactDisplayName.getrDrawableName(), "drawable", context.getPackageName());
+            int drawableResourceId = context.getResources().getIdentifier(contactDisplayName.getrDrawableName(),
+                    "drawable", context.getPackageName());
             contactImage.setImageResource(drawableResourceId);
             contactImage.setVisibility(View.VISIBLE);
             alphabeticTextView.setVisibility(View.GONE);

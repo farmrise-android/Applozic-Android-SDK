@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -186,7 +187,7 @@ public class MessageInfoFragment extends Fragment {
 
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        menu.findItem(R.id.dial).setVisible(false);
+        //menu.findItem(R.id.dial).setVisible(false);
         menu.removeItem(R.id.start_new);
         menu.removeItem(R.id.conversations);
         menu.removeItem(R.id.deleteConversation);
@@ -347,8 +348,9 @@ public class MessageInfoFragment extends Fragment {
             this.messageInfoList = messageInfoList;
         }
 
+        @NonNull
         @Override
-        public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View itemView = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.contact_users_layout, parent, false);
 
@@ -356,7 +358,7 @@ public class MessageInfoFragment extends Fragment {
         }
 
         @Override
-        public void onBindViewHolder(MyViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
             MessageInfo messageInfo = messageInfoList.get(position);
             String contactNumber;
             char firstLetter;

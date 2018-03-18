@@ -42,8 +42,8 @@
     <color name="applozic_multimedia_grid_view_background_color">#F0F0F0</color>
 
     <color name="applozic_theme_color">#FFB3E5FC</color>
-    <color name="applozic_theme_color_primary">#FF029A43</color>
-    <color name="applozic_theme_color_primary_dark">#FF0288D1</color>
+    <color name="applozic_theme_color_primary">#169947</color> <!--#FF029A43-->
+    <color name="applozic_theme_color_primary_dark">#3fb76f</color> <!--#FF0288D1-->
     <color name="applozic_theme_color_accent">#FF607D8B</color>
     <color name="applozic_theme_color_app">#ff0099cc</color>
     <color name="applozic_theme_color_control_activated">#ff0099cc</color>

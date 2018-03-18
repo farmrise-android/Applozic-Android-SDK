@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="?android:attr/listPreferredItemHeight"
-    android:orientation="vertical">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="8dp">
 
     <RelativeLayout
         android:id="@+id/profile_image_relative_layout"
@@ -24,7 +26,6 @@
             android:textColor="#ffffff"
             android:textSize="20dp"
             android:visibility="gone" />
-
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/contactImage"
@@ -49,7 +50,7 @@
         android:paddingLeft="@dimen/listview_item_padding"
         android:paddingStart="@dimen/listview_item_padding"
         android:textDirection="locale"
-        android:textAlignment="gravity"
+        android:textAlignment="gravity" android:text="Just now"
         android:paddingRight="@dimen/listview_item_padding"
         android:paddingEnd="@dimen/listview_item_padding"
         android:singleLine="true"
@@ -74,15 +75,14 @@
         android:textAlignment="gravity"
         android:layout_toRightOf="@id/profile_image_relative_layout"
         android:ellipsize="marquee"
-        android:fontFamily="sans-serif-light"
         android:gravity="center_vertical"
         android:paddingLeft="@dimen/listview_item_padding"
         android:paddingStart="@dimen/listview_item_padding"
         android:paddingRight="@dimen/listview_item_padding"
         android:paddingEnd="@dimen/listview_item_padding"
-        android:singleLine="true"
-        android:textColor="#616161"
-        android:textSize="15sp"
+        android:maxLines="1"
+        android:textColor="#FF333333"
+        android:textSize="15sp" android:text="Sai Android"
         android:layout_alignParentEnd="true"
         android:layout_toEndOf="@id/profile_image_relative_layout" />
 
@@ -94,7 +94,6 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/displayName"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="10dp"
         android:background="@drawable/admin_text"
         android:gravity="center"
         android:padding="2dp"
@@ -104,10 +103,11 @@
         android:paddingRight="10dp"
         android:paddingEnd="10dp"
         android:paddingTop="1dp"
-        android:singleLine="true"
+        android:maxLines="1"
         android:text="@string/admin_text"
         android:textSize="12sp"
         android:visibility="gone"
         android:layout_alignParentEnd="true"
-        android:layout_marginEnd="10dp" />
+        />
+
 </RelativeLayout>

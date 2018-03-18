@@ -281,13 +281,13 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
         if (alCustomizationSettings.isMessageSearchOption()) {
             menu.findItem(R.id.menu_search).setVisible(true);
         }
-        /*if (alCustomizationSettings.isBroadcastOption()) {
+       /* if (alCustomizationSettings.isBroadcastOption()) {
             menu.findItem(R.id.broadcast).setVisible(true);
         }*/
-        if (alCustomizationSettings.isLogoutOption()) {
+      /*  if (alCustomizationSettings.isLogoutOption()) {
             menu.findItem(R.id.logout).setVisible(true);
-        }
-        super.onCreateOptionsMenu(menu, inflater);
+        }*/
+        //super.onCreateOptionsMenu(menu, inflater);
     }
 
     public void addMessage(final Message message) {
@@ -550,19 +550,23 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
     public void checkForEmptyConversations() {
         boolean isLodingConversation = (downloadConversation != null && downloadConversation.getStatus() == AsyncTask.Status.RUNNING);
         if (latestMessageForEachContact.isEmpty() && !isLodingConversation) {
-            emptyTextView.setVisibility(View.VISIBLE);
+
+            /*emptyTextView.setVisibility(View.VISIBLE);
             emptyTextView.setText(!TextUtils.isEmpty(alCustomizationSettings.getNoConversationLabel()) ? alCustomizationSettings.getNoConversationLabel() : getResources().getString(R.string.no_conversation));
+*/
+
 
             Log.d("emptyTextView3", "emptyTextView3");
-            //startChatLayout.setVisibility(View.VISIBLE);
-            startChatLayout.setVisibility(View.GONE);
+
+            emptyTextView.setVisibility(View.GONE);
+            startChatLayout.setVisibility(View.VISIBLE);
 
             //startNewButton.setVisibility(applozicSetting.isStartNewButtonVisible() ? View.VISIBLE : View.GONE);
         } else {
             emptyTextView.setVisibility(View.GONE);
             //startNewButton.setVisibility(View.GONE);
             Log.d("emptyTextView4", "emptyTextView4");
-            startChatLayout.setVisibility(View.VISIBLE);
+            startChatLayout.setVisibility(View.GONE);
         }
     }
 
@@ -854,6 +858,19 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
         private WeakReference<QuickConversationAdapter> quickConversationAdapterWeakReference;
         private WeakReference<TextView> textViewWeakReference;
 
+
+        public void setQuickConversationAdapterWeakReference(QuickConversationAdapter quickConversationAdapterWeakReference) {
+            this.quickConversationAdapterWeakReference = new WeakReference<QuickConversationAdapter>(quickConversationAdapterWeakReference);
+        }
+
+        public void setTextViewWeakReference(TextView emptyTextViewWeakReference) {
+            this.textViewWeakReference = new WeakReference<TextView>(emptyTextViewWeakReference);
+        }
+
+        public void setSwipeRefreshLayoutWeakReference(SwipeRefreshLayout swipeRefreshLayout) {
+            this.swipeRefreshLayoutWeakReference = new WeakReference<SwipeRefreshLayout>(swipeRefreshLayout);
+        }
+
         public DownloadConversation(RecyclerView view, boolean initial, int firstVisibleItem, int amountVisible, int totalItems, boolean showInstruction, String searchString) {
             this.context = getActivity();
             this.view = view;
@@ -868,18 +885,6 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
         public DownloadConversation(RecyclerView view, boolean initial, int firstVisibleItem, int amountVisible, int totalItems) {
             this(view, initial, firstVisibleItem, amountVisible, totalItems, false, null);
             loadMoreMessages = true;
-        }
-
-        public void setQuickConversationAdapterWeakReference(QuickConversationAdapter quickConversationAdapterWeakReference) {
-            this.quickConversationAdapterWeakReference = new WeakReference<QuickConversationAdapter>(quickConversationAdapterWeakReference);
-        }
-
-        public void setTextViewWeakReference(TextView emptyTextViewWeakReference) {
-            this.textViewWeakReference = new WeakReference<TextView>(emptyTextViewWeakReference);
-        }
-
-        public void setSwipeRefreshLayoutWeakReference(SwipeRefreshLayout swipeRefreshLayout) {
-            this.swipeRefreshLayoutWeakReference = new WeakReference<SwipeRefreshLayout>(swipeRefreshLayout);
         }
 
         @Override
@@ -1005,7 +1010,10 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
 
                         Log.d("emptyTextViewmessageList", ""+messageList.size());
 
+                        emptyTextView.setVisibility(View.GONE);
+                        startChatLayout.setVisibility(View.GONE);
 
+/*
                         if(messageList.isEmpty()){
                             emptyTextView.setVisibility(View.GONE);
                             startChatLayout.setVisibility(View.VISIBLE);
@@ -1014,19 +1022,27 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
                             emptyTextView.setVisibility(View.GONE);
                             startChatLayout.setVisibility(View.GONE);
                             Log.d("emptyTextViewEmptyNo", "emptyTextViewEmptyNo");
-                        }
-
-                        Log.d("emptyTextView5", "emptyTextView5");
+                        }*/
 
                         if (!TextUtils.isEmpty(searchString) && messageList.isEmpty()) {
                             emptyTextView.setText(!TextUtils.isEmpty
                                     (alCustomizationSettings.getNoSearchFoundForChatMessages()) ?
                                     alCustomizationSettings.getNoSearchFoundForChatMessages() :
                                     getResources().getString(R.string.search_not_found_for_messages));
+                            Log.d("emptyTextView20", "emptyTextView20");
+
+                            emptyTextView.setVisibility(View.VISIBLE);
+                            startChatLayout.setVisibility(View.GONE);
+
                         } else if (TextUtils.isEmpty(searchString) && messageList.isEmpty()) {
-                            emptyTextView.setText(!TextUtils.isEmpty(alCustomizationSettings.getNoConversationLabel())
+                            emptyTextView.setText(!TextUtils.isEmpty
+                                    (alCustomizationSettings.getNoConversationLabel())
                                     ? alCustomizationSettings.getNoConversationLabel() :
                                     getResources().getString(R.string.no_conversation));
+                            Log.d("emptyTextView30", "emptyTextView30");
+
+                            emptyTextView.setVisibility(View.GONE);
+                            startChatLayout.setVisibility(View.VISIBLE);
                         }
                     }
                 }

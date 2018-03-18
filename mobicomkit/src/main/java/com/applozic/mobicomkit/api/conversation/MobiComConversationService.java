@@ -336,7 +336,7 @@ public class MobiComConversationService {
             contact.setUserId(userDetail.getUserId());
             contact.setContactNumber(userDetail.getPhoneNumber());
             contact.setStatus(userDetail.getStatusMessage());
-            //contact.setApplicationId(); Todo: set the application id
+            contact.setApplicationId("orphan12e5101382f0cc751fa8c224"); //Todo: set the application id
             contact.setConnected(userDetail.isConnected());
             contact.setFullName(userDetail.getDisplayName());
             contact.setLastSeenAt(userDetail.getLastSeenAtTime());

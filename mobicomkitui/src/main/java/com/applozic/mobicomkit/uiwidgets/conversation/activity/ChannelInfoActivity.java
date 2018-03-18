@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.net.ConnectivityManager;
 import android.net.Uri;
@@ -131,6 +132,7 @@ public class ChannelInfoActivity extends AppCompatActivity {
         createdBy = (TextView) findViewById(R.id.created_by);
         groupParticipantsTexView = (TextView) findViewById(R.id.groupParticipantsTexView);
         exitChannelButton = (Button) findViewById(R.id.exit_channel);
+        //exitChannelButton.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/NotoSans-Regular.ttf"));
         deleteChannelButton = (Button) findViewById(R.id.delete_channel_button);
         channelDeleteRelativeLayout = (RelativeLayout) findViewById(R.id.channel_delete_relativeLayout);
         channelExitRelativeLayout = (RelativeLayout) findViewById(R.id.channel_exit_relativeLayout);
@@ -138,7 +140,7 @@ public class ChannelInfoActivity extends AppCompatActivity {
         collapsingToolbarLayout.setContentScrimColor(Color.parseColor(alCustomizationSettings.getCollapsingToolbarLayoutColor()));
         groupParticipantsTexView.setTextColor(Color.parseColor(alCustomizationSettings.getGroupParticipantsTextColor()));
         deleteChannelButton.setBackgroundColor(Color.parseColor((alCustomizationSettings.getGroupDeleteButtonBackgroundColor())));
-        exitChannelButton.setBackgroundColor(Color.parseColor(alCustomizationSettings.getGroupExitButtonBackgroundColor()));
+        //exitChannelButton.setBackgroundColor(Color.parseColor(alCustomizationSettings.getGroupExitButtonBackgroundColor()));
 
         mActionBar = getSupportActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);

@@ -6,14 +6,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
-        android:id="@+id/container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/navigation"
-        android:animateLayoutChanges="true">
+    <!--<FrameLayout-->
+        <!--android:id="@+id/container"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_above="@+id/navigation"-->
+        <!--android:animateLayoutChanges="true">-->
 
-    </FrameLayout>
+    <!--</FrameLayout>-->
+
+
+    <RelativeLayout
+        android:id="@+id/layout_child_activity"
+        android:background="@color/conversation_list_all_background"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="left|top" />
+
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"
@@ -25,4 +34,5 @@
         app:itemIconTint="@color/white"
         app:itemTextColor="@color/white"
         app:menu="@menu/bottom_navigation_items" />
+
 </RelativeLayout>

@@ -22,7 +22,6 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
@@ -55,7 +54,6 @@ import com.applozic.mobicomkit.api.MobiComKitConstants;
 import com.applozic.mobicomkit.api.account.register.RegisterUserClientService;
 import com.applozic.mobicomkit.api.account.user.MobiComUserPreference;
 import com.applozic.mobicomkit.api.account.user.User;
-import com.applozic.mobicomkit.api.account.user.UserClientService;
 import com.applozic.mobicomkit.api.attachment.FileClientService;
 import com.applozic.mobicomkit.api.conversation.ApplozicMqttIntentService;
 import com.applozic.mobicomkit.api.conversation.Message;
@@ -68,11 +66,9 @@ import com.applozic.mobicomkit.broadcast.ConnectivityReceiver;
 import com.applozic.mobicomkit.channel.database.ChannelDatabaseService;
 import com.applozic.mobicomkit.contact.AppContactService;
 import com.applozic.mobicomkit.contact.BaseContactService;
-import com.applozic.mobicomkit.contact.database.ContactDatabase;
 import com.applozic.mobicomkit.uiwidgets.AlCustomizationSettings;
 import com.applozic.mobicomkit.uiwidgets.ApplozicSetting;
 import com.applozic.mobicomkit.uiwidgets.R;
-import com.applozic.mobicomkit.uiwidgets.async.AlGetMembersFromContactGroupListTask;
 import com.applozic.mobicomkit.uiwidgets.conversation.ConversationUIService;
 import com.applozic.mobicomkit.uiwidgets.conversation.MessageCommunicator;
 import com.applozic.mobicomkit.uiwidgets.conversation.MobiComKitBroadcastReceiver;
@@ -105,7 +101,6 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -127,6 +122,7 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
     public static final String CONVERSATION_ID = "conversationId";
     public static final String GOOGLE_API_KEY_META_DATA = "com.google.android.geo.API_KEY";
     public static final String ACTIVITY_TO_OPEN_ONCLICK_OF_CALL_BUTTON_META_DATA = "activity.open.on.call.button.click";
+    public static final String CONTACTS_GROUP_ID = "CONTACTS_GROUP_ID";
     protected static final long UPDATE_INTERVAL = 500;
     protected static final long FASTEST_INTERVAL = 1;
     private static final String LOAD_FILE = "loadFile";
@@ -135,7 +131,6 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
     private static final String CAPTURED_IMAGE_URI = "capturedImageUri";
     private static final String CAPTURED_VIDEO_URI = "capturedVideoUri";
     private static final String SHARE_TEXT = "share_text";
-    public static final String CONTACTS_GROUP_ID = "CONTACTS_GROUP_ID";
     private static Uri capturedImageUri;
     private static String inviteMessage;
     private static int retry;
@@ -187,7 +182,8 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
                 fragmentTag);
 
         if (supportFragmentManager.getBackStackEntryCount() > 1
-                && !ConversationUIService.MESSGAE_INFO_FRAGMENT.equalsIgnoreCase(fragmentTag) && !ConversationUIService.USER_PROFILE_FRAMENT.equalsIgnoreCase(fragmentTag)) {
+                && !ConversationUIService.MESSGAE_INFO_FRAGMENT.equalsIgnoreCase(fragmentTag) &&
+                !ConversationUIService.USER_PROFILE_FRAMENT.equalsIgnoreCase(fragmentTag)) {
             supportFragmentManager.popBackStackImmediate();
         }
 
@@ -344,9 +340,12 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
         baseContactService = new AppContactService(this);
-        conversationUIService = new ConversationUIService(this);
+
         mobiComMessageService = new MobiComMessageService(this, MessageIntentService.class);
         quickConversationFragment = new MobiComQuickConversationFragment();
+        conversationUIService = new ConversationUIService(this);
+
+
         connectivityReceiver = new ConnectivityReceiver();
         geoApiKey = Utils.getMetaDataValue(getApplicationContext(), GOOGLE_API_KEY_META_DATA);
         activityToOpenOnClickOfCallButton = Utils.getMetaDataValue(getApplicationContext(), ACTIVITY_TO_OPEN_ONCLICK_OF_CALL_BUTTON_META_DATA);
@@ -449,7 +448,8 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
         try {
             if (intent.getExtras() != null) {
 
-                if(intent.getBooleanExtra(ConversationUIService.PROFILE_INTENT,false)) {
+                //if condition is for, when clicked on profile in toolbar, navigating to profile screen
+                if (intent.getBooleanExtra(ConversationUIService.PROFILE_INTENT, false)) {
                     profilefragment.setApplozicPermissions(applozicPermission);
                     addFragment(this, profilefragment, ProfileFragment.ProfileFragmentTag);
                     return;
@@ -566,7 +566,7 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,int[] grantResults) {
         if (requestCode == PermissionsUtils.REQUEST_STORAGE) {
             if (PermissionsUtils.verifyPermissions(grantResults)) {
                 showSnackBar(R.string.storage_permission_granted);
@@ -740,7 +740,7 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
         } else if (id == R.id.applozicUserProfile) {
             profilefragment.setApplozicPermissions(applozicPermission);
             addFragment(this, profilefragment, ProfileFragment.ProfileFragmentTag);
-        } else if (id == R.id.logout) {
+        } /*else if (id == R.id.logout) {
             try {
                 if (!TextUtils.isEmpty(alCustomizationSettings.getLogoutPackage())) {
                     Class loginActivity = Class.forName(alCustomizationSettings.getLogoutPackage().trim());
@@ -756,7 +756,7 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
         return false;
     }
 

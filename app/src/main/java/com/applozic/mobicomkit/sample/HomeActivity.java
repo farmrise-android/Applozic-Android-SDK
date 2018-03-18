@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
@@ -59,6 +60,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
     ConversationUIService conversationUIService;
     MobiComQuickConversationFragment mobiComQuickConversationFragment;
     MobiComKitBroadcastReceiver mobiComKitBroadcastReceiver;
+
     private HashMap<String, Stack<Fragment>> mStacks;
     private BottomNavigationView bottomNavigationView;
     private String currentTab;
@@ -102,15 +104,16 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         lastSeenStatusIntent.putExtra(UserIntentService.USER_LAST_SEEN_AT_STATUS, true);
         startService(lastSeenStatusIntent);
 
+        //addFragment(this, mobiComQuickConversationFragment, ConversationUIService.QUICK_CONVERSATION_FRAGMENT); //here we are adding fragment
+
         mActionBar = getSupportActionBar();
-        // addFragment(this, mobiComQuickConversationFragment, ConversationUIService.QUICK_CONVERSATION_FRAGMENT); //here we are adding fragment
         //Used to select an item programmatically
         //bottomNavigationView.getMenu().getItem(2).setChecked(true);
     }
 
     private void goToFragment(Fragment selectedFragment) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.container, selectedFragment);
+        fragmentTransaction.replace(R.id.layout_child_activity, selectedFragment);
         fragmentTransaction.commit();
     }
 
@@ -144,13 +147,23 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                 pushFragments(tabId, new HomeFragment(), true);
                 break;
             case TAB_CHAT:
-               /* if (MobiComUserPreference.getInstance(this).isLoggedIn()) {
-                    pushFragments(tabId, new MobiComQuickConversationFragment(), true);
+
+                if (MobiComUserPreference.getInstance(this).isLoggedIn()) {
+                   /* //pushFragments(tabId, new MobiComQuickConversationFragment(), true);
+                    Intent intent = new Intent(this, ConversationActivity.class);
+                    if (ApplozicClient.getInstance(this).isContextBasedChat()) {
+                        intent.putExtra(ConversationUIService.CONTEXT_BASED_CHAT, true);
+                    }
+                    startActivity(intent);*/
+
+                    addFragment(this, mobiComQuickConversationFragment, ConversationUIService.QUICK_CONVERSATION_FRAGMENT); //here we are adding fragment
+
+
                 } else {
                     login();
-                }*/
+                }
 
-               login();
+                //login();
                 break;
         }
         /*} else {
@@ -167,7 +180,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
             mStacks.get(tag).push(fragment);
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction ft = manager.beginTransaction();
-        ft.replace(R.id.container, fragment);
+        ft.replace(R.id.layout_child_activity, fragment);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         //ft.addToBackStack(null);
         ft.commit();
@@ -186,7 +199,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
   /* We have the target fragment in hand.. Just show it.. Show a standard navigation animation*/
         FragmentManager manager = getSupportFragmentManager();
         FragmentTransaction ft = manager.beginTransaction();
-        ft.replace(R.id.container, fragment);
+        ft.replace(R.id.layout_child_activity, fragment);
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
         ft.commit();
     }
@@ -328,17 +341,16 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
 
                 ApplozicClient.getInstance(context).setContextBasedChat(true).setHandleDial(true);
 
-                Map<ApplozicSetting.RequestCode, String> activityCallbacks = new HashMap<ApplozicSetting.RequestCode, String>();
+                /*Map<ApplozicSetting.RequestCode, String> activityCallbacks = new HashMap<ApplozicSetting.RequestCode, String>();
                 activityCallbacks.put(ApplozicSetting.RequestCode.USER_LOOUT, HomeActivity.class.getName());
-                ApplozicSetting.getInstance(context).setActivityCallbacks(activityCallbacks);
+                ApplozicSetting.getInstance(context).setActivityCallbacks(activityCallbacks);*/
 
                 if (MobiComUserPreference.getInstance(context).isRegistered()) {
 
-/*
                     //Set activity callbacks
                     Map<ApplozicSetting.RequestCode, String> activityCallbacks = new HashMap<ApplozicSetting.RequestCode, String>();
-                    activityCallbacks.put(ApplozicSetting.RequestCode.MESSAGE_TAP, HomeActivity.class.getName());
-                    ApplozicSetting.getInstance(context).setActivityCallbacks(activityCallbacks);*/
+                    activityCallbacks.put(ApplozicSetting.RequestCode.MESSAGE_TAP, ConversationActivity.class.getName());
+                    ApplozicSetting.getInstance(context).setActivityCallbacks(activityCallbacks);
 
                     //Start GCM registration....
                     PushNotificationTask pushNotificationTask = null;
@@ -358,8 +370,17 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                     pushNotificationTask.execute((Void) null);
                 }
 
-                ApplozicClient.getInstance(context).hideChatListOnNotification();
-                pushFragments(TAB_CHAT, new MobiComQuickConversationFragment(), true);
+                 ApplozicClient.getInstance(context).hideChatListOnNotification();
+                //pushFragments(TAB_CHAT, new MobiComQuickConversationFragment(), true);
+                /*Intent intent = new Intent(HomeActivity.this, ConversationActivity.class);
+                if (ApplozicClient.getInstance(HomeActivity.this).isContextBasedChat()) {
+                    intent.putExtra(ConversationUIService.CONTEXT_BASED_CHAT, true);
+                }
+               //startActivity(intent);*/
+
+                addFragment(HomeActivity.this, mobiComQuickConversationFragment, ConversationUIService.QUICK_CONVERSATION_FRAGMENT); //here we are adding fragment
+
+
             }
 
             @Override
@@ -380,8 +401,13 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         };
 
         User user = new User();
-        user.setUserId("mon2");
-        user.setContactNumber("9292929292");
+        user.setUserId("montest");
+        //user.setEmail("pskreddy"@gmail.com);
+        user.setContactNumber("7109109100");
+        user.setPassword("7109109100");
+        user.setDisplayName("7109109100");
+        //user.setAuthenticationTypeId(authenticationType.getValue());
+
 
 
         new UserLoginTask(user, listener, this).execute((Void) null);
@@ -461,6 +487,21 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                 break;
 
         }
+    }
+    public static void addFragment(FragmentActivity fragmentActivity, Fragment fragmentToAdd, String fragmentTag) {
+        FragmentManager supportFragmentManager = fragmentActivity.getSupportFragmentManager();
+
+        FragmentTransaction fragmentTransaction = supportFragmentManager
+                .beginTransaction();
+        fragmentTransaction.replace(R.id.layout_child_activity, fragmentToAdd,
+                fragmentTag);
+
+        if (supportFragmentManager.getBackStackEntryCount() > 1) {
+            supportFragmentManager.popBackStackImmediate();
+        }
+        fragmentTransaction.addToBackStack(fragmentTag);
+        fragmentTransaction.commitAllowingStateLoss();
+        supportFragmentManager.executePendingTransactions();
     }
 
 }

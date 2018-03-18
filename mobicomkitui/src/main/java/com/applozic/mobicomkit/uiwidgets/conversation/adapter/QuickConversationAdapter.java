@@ -203,7 +203,8 @@ public class QuickConversationAdapter extends RecyclerView.Adapter implements Fi
 
                 myholder.onlineTextView.setVisibility(View.GONE);
                 if (alCustomizationSettings.isOnlineStatusMasterList()) {
-                    myholder.onlineTextView.setVisibility(contactReceiver != null && contactReceiver.isOnline() ? View.VISIBLE : View.GONE);
+                    myholder.onlineTextView.setVisibility(contactReceiver != null &&
+                            contactReceiver.isOnline() ? View.VISIBLE : View.GONE);
                 }
 
                 if (myholder.attachedFile != null) {

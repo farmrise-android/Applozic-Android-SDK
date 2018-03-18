@@ -146,10 +146,10 @@
     <string name="unmute_Group">Unmute</string>
     <string name="user_name_info">[name]</string>
     <string name="channel_member_title">Select contact</string>
-    <string name="channel_exit_button">EXIT GROUP</string>
-    <string name="channel_delete_group_button">DELETE GROUP</string>
-    <string name="broadcast_exit_button">EXIT BROADCAST</string>
-    <string name="broadcast_delete_button">DELETE BROADCAST</string>
+    <string name="channel_exit_button">Exit Group</string>
+    <string name="channel_delete_group_button">Delete Group</string>
+    <string name="broadcast_exit_button">Exit Broadcast</string>
+    <string name="broadcast_delete_button">Delete Broadcast</string>
     <string name="channel_created_by">Created by</string>
     <string name="remove_member">Remove</string>
     <string name="add">Add</string>
