@@ -64,6 +64,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
     private HashMap<String, Stack<Fragment>> mStacks;
     private BottomNavigationView bottomNavigationView;
     private String currentTab;
+    private boolean isStopCalled = false;
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
@@ -88,6 +89,22 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
     };
     private int id = 0;
 
+    public static void addFragment(FragmentActivity fragmentActivity, Fragment fragmentToAdd, String fragmentTag) {
+        FragmentManager supportFragmentManager = fragmentActivity.getSupportFragmentManager();
+
+        FragmentTransaction fragmentTransaction = supportFragmentManager
+                .beginTransaction();
+        fragmentTransaction.replace(R.id.layout_child_activity, fragmentToAdd,
+                fragmentTag);
+
+        if (supportFragmentManager.getBackStackEntryCount() > 1) {
+            supportFragmentManager.popBackStackImmediate();
+        }
+        fragmentTransaction.addToBackStack(fragmentTag);
+        fragmentTransaction.commitAllowingStateLoss();
+        supportFragmentManager.executePendingTransactions();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,18 +121,16 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         lastSeenStatusIntent.putExtra(UserIntentService.USER_LAST_SEEN_AT_STATUS, true);
         startService(lastSeenStatusIntent);
 
-        //addFragment(this, mobiComQuickConversationFragment, ConversationUIService.QUICK_CONVERSATION_FRAGMENT); //here we are adding fragment
-
         mActionBar = getSupportActionBar();
         //Used to select an item programmatically
         //bottomNavigationView.getMenu().getItem(2).setChecked(true);
     }
 
-    private void goToFragment(Fragment selectedFragment) {
+  /*  private void goToFragment(Fragment selectedFragment) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.layout_child_activity, selectedFragment);
         fragmentTransaction.commit();
-    }
+    }*/
 
     private void initialize() {
 
@@ -157,13 +172,12 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                     startActivity(intent);*/
 
                     addFragment(this, mobiComQuickConversationFragment, ConversationUIService.QUICK_CONVERSATION_FRAGMENT); //here we are adding fragment
-
+                    pushFragments(tabId, mobiComQuickConversationFragment, true);
 
                 } else {
                     login();
                 }
 
-                //login();
                 break;
         }
         /*} else {
@@ -176,32 +190,64 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
     }
 
     public void pushFragments(String tag, Fragment fragment, boolean shouldAdd) {
-        if (shouldAdd)
-            mStacks.get(tag).push(fragment);
-        FragmentManager manager = getSupportFragmentManager();
-        FragmentTransaction ft = manager.beginTransaction();
-        ft.replace(R.id.layout_child_activity, fragment);
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        //ft.addToBackStack(null);
-        ft.commit();
+
+        if (!isStopCalled) {
+
+            if (!isFinishing() && !isDestroyed()) {
+                FragmentManager manager = getSupportFragmentManager();
+                if (fragment != null && getSupportFragmentManager() != null &&
+                        !getSupportFragmentManager().isDestroyed()) {
+
+                    if (shouldAdd)
+                    mStacks.get(tag).push(fragment);
+                    //FragmentManager manager = getSupportFragmentManager();
+                    FragmentTransaction ft = manager.beginTransaction();
+                    ft.replace(R.id.layout_child_activity, fragment);
+                    //ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                    //ft.addToBackStack(null);
+                    ft.commit();
+                }
+            }
+        }
     }
 
-    public void popFragments() {
-  /*
-   *    Select the second last fragment in current tab's stack..
-   *    which will be shown after the fragment transaction given below
-   */
-        Fragment fragment = mStacks.get(currentTab).elementAt(mStacks.get(currentTab).size() - 2);
+    private void popFragments() {
 
-  /*pop current fragment from stack.. */
-        mStacks.get(currentTab).pop();
+        Fragment fragment;
 
-  /* We have the target fragment in hand.. Just show it.. Show a standard navigation animation*/
-        FragmentManager manager = getSupportFragmentManager();
-        FragmentTransaction ft = manager.beginTransaction();
-        ft.replace(R.id.layout_child_activity, fragment);
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-        ft.commit();
+        /*pop current fragment from stack.. */
+        if (mStacks.get(currentTab).get(mStacks.get(currentTab).size() - 1).getClass().getSimpleName().equals("ErrorFragment") ||
+                mStacks.get(currentTab).get(mStacks.get(currentTab).size() - 1).getClass().getSimpleName().equals("NoInternetFragment")) {
+
+            /*
+             *  Select the second last fragment in current tab's stack..
+             *  which will be shown after the fragment transaction given below
+             */
+            fragment = mStacks.get(currentTab).elementAt(mStacks.get(currentTab).size() - 3);
+
+            mStacks.get(currentTab).pop();
+            mStacks.get(currentTab).pop();
+        } else {
+
+            fragment = mStacks.get(currentTab).elementAt(mStacks.get(currentTab).size() - 2);
+            mStacks.get(currentTab).pop();
+        }
+
+        /* We have the target fragment in hand.. Just show it.. Show a standard navigation animation*/
+        if (!isStopCalled) {
+            if (!isFinishing() && !isDestroyed()) {
+
+                FragmentManager manager = getSupportFragmentManager();
+
+                if (fragment != null && getSupportFragmentManager() != null && !getSupportFragmentManager().isDestroyed()) {
+
+                    FragmentTransaction ft = manager.beginTransaction();
+                    ft.replace(R.id.layout_child_activity, fragment);
+                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+                    ft.commit();
+                }
+            }
+        }
     }
 
     @Override
@@ -284,7 +330,6 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         return retry;
     }
 
-
     /*@Override
     public void onBackPressed() {
 
@@ -302,6 +347,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
     }*/
     @Override
     protected void onStop() {
+        isStopCalled = true;
         super.onStop();
         final String deviceKeyString = MobiComUserPreference.getInstance(this).getDeviceKeyString();
         final String userKeyString = MobiComUserPreference.getInstance(this).getSuUserKeyString();
@@ -314,6 +360,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
     @Override
     protected void onResume() {
         super.onResume();
+        isStopCalled = false;
         LocalBroadcastManager.getInstance(this).registerReceiver(mobiComKitBroadcastReceiver, BroadcastService.getIntentFilter());
         Intent subscribeIntent = new Intent(this, ApplozicMqttIntentService.class);
         subscribeIntent.putExtra(ApplozicMqttIntentService.SUBSCRIBE, true);
@@ -366,12 +413,13 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                         }
                     };
                     pushNotificationTask = new PushNotificationTask(
-                            Applozic.getInstance(context).getDeviceRegistrationId(), pushNotificationTaskListener, context);
+                            Applozic.getInstance(context).getDeviceRegistrationId(),
+                            pushNotificationTaskListener, context);
                     pushNotificationTask.execute((Void) null);
                 }
 
-                 ApplozicClient.getInstance(context).hideChatListOnNotification();
-                //pushFragments(TAB_CHAT, new MobiComQuickConversationFragment(), true);
+                ApplozicClient.getInstance(context).hideChatListOnNotification();
+
                 /*Intent intent = new Intent(HomeActivity.this, ConversationActivity.class);
                 if (ApplozicClient.getInstance(HomeActivity.this).isContextBasedChat()) {
                     intent.putExtra(ConversationUIService.CONTEXT_BASED_CHAT, true);
@@ -379,7 +427,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                //startActivity(intent);*/
 
                 addFragment(HomeActivity.this, mobiComQuickConversationFragment, ConversationUIService.QUICK_CONVERSATION_FRAGMENT); //here we are adding fragment
-
+                pushFragments(TAB_CHAT, mobiComQuickConversationFragment, true);
 
             }
 
@@ -407,7 +455,6 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         user.setPassword("7109109100");
         user.setDisplayName("7109109100");
         //user.setAuthenticationTypeId(authenticationType.getValue());
-
 
 
         new UserLoginTask(user, listener, this).execute((Void) null);
@@ -487,21 +534,6 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                 break;
 
         }
-    }
-    public static void addFragment(FragmentActivity fragmentActivity, Fragment fragmentToAdd, String fragmentTag) {
-        FragmentManager supportFragmentManager = fragmentActivity.getSupportFragmentManager();
-
-        FragmentTransaction fragmentTransaction = supportFragmentManager
-                .beginTransaction();
-        fragmentTransaction.replace(R.id.layout_child_activity, fragmentToAdd,
-                fragmentTag);
-
-        if (supportFragmentManager.getBackStackEntryCount() > 1) {
-            supportFragmentManager.popBackStackImmediate();
-        }
-        fragmentTransaction.addToBackStack(fragmentTag);
-        fragmentTransaction.commitAllowingStateLoss();
-        supportFragmentManager.executePendingTransactions();
     }
 
 }

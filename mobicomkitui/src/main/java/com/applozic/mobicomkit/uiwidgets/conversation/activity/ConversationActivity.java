@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
@@ -782,6 +783,43 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
 
     @Override
     public void onBackPressed() {
+        ConversationFragment conversationFragment = (ConversationFragment) getSupportFragmentManager().findFragmentByTag(ConversationUIService.CONVERSATION_FRAGMENT);
+        if (conversationFragment != null && conversationFragment.isVisible() && (conversationFragment.multimediaPopupGrid.getVisibility() == View.VISIBLE)) {
+            conversationFragment.hideMultimediaOptionGrid();
+            return;
+        }
+        if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
+            super.onBackPressed();
+            return;
+        }
+        if (getSupportFragmentManager().getBackStackEntryCount() == 1) {
+            try {
+                Intent upIntent = NavUtils.getParentActivityIntent(this);
+                if (upIntent != null && isTaskRoot()) {
+                    TaskStackBuilder.create(this).addNextIntentWithParentStack(upIntent).startActivities();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            this.finish();
+            return;
+        }
+        Boolean takeOrder = getIntent().getBooleanExtra(TAKE_ORDER, false);
+        if (takeOrder) {
+            Intent upIntent = NavUtils.getParentActivityIntent(this);
+            if (upIntent != null && isTaskRoot()) {
+                TaskStackBuilder.create(this).addNextIntentWithParentStack(upIntent).startActivities();
+            }
+            ConversationActivity.this.finish();
+        } else {
+            super.onBackPressed();
+        }
+
+    }
+
+
+   /* @Override
+    public void onBackPressed() {
         if (getSupportFragmentManager().getBackStackEntryCount() == 1) {
             try {
                 Intent upIntent = NavUtils.getParentActivityIntent(this);
@@ -810,7 +848,7 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
             super.onBackPressed();
         }
 
-    }
+    }*/
 
     @Override
     public void updateLatestMessage(Message message, String formattedContactNumber) {
@@ -862,7 +900,7 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         if (connectionResult.hasResolution()) {
             try {
                 // Start an Activity that tries to resolve the error

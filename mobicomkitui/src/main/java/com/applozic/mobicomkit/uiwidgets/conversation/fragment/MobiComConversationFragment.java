@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.provider.OpenableColumns;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationManagerCompat;
@@ -160,7 +161,8 @@ import static java.util.Collections.disjoint;
  * reg
  * Created by devashish on 10/2/15.
  */
-abstract public class MobiComConversationFragment extends Fragment implements View.OnClickListener, GestureDetector.OnGestureListener, ContextMenuClickListener {
+abstract public class MobiComConversationFragment extends Fragment implements View.OnClickListener,
+        GestureDetector.OnGestureListener, ContextMenuClickListener {
 
     //Todo: Increase the file size limit
     public static final int MAX_ALLOWED_FILE_SIZE = 10 * 1024 * 1024;
@@ -211,6 +213,8 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
     protected Message messageToForward;
     protected String searchString;
     protected AlCustomizationSettings alCustomizationSettings;
+    protected TextView isTyping, bottomlayoutTextView;
+    protected LinearLayoutManager linearLayoutManager;
     String audio_duration;
     LinearLayout userNotAbleToChatLayout;
     int resourceId;
@@ -244,9 +248,16 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
     int seconds = 0, minutes = 0;
     ApplozicDocumentView applozicDocumentView;
     ImageView slideImageView;
+    WeakReference<ImageButton> recordButtonWeakReference;
+    RecyclerView recyclerView;
+    RecyclerViewPositionHelper recyclerViewPositionHelper;
+    int positionInSmsList;
+    DetailedConversationAdapter recyclerDetailConversationAdapter;
+    MobicomMessageTemplate messageTemplate;
+    MobicomMessageTemplateAdapter templateAdapter;
+    boolean isAlreadyLoading;
     private EmojiconHandler emojiIconHandler;
     private Bitmap previewThumbnail;
-    protected TextView isTyping, bottomlayoutTextView;
     private String defaultText;
     private boolean typingStarted;
     private Integer channelKey;
@@ -260,15 +271,6 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
     private EditText errorEditTextView;
     private RecyclerView messageTemplateView;
     private ImageView audioRecordIconImageView;
-    WeakReference<ImageButton> recordButtonWeakReference;
-    RecyclerView recyclerView;
-    RecyclerViewPositionHelper recyclerViewPositionHelper;
-    protected LinearLayoutManager linearLayoutManager;
-    int positionInSmsList;
-    DetailedConversationAdapter recyclerDetailConversationAdapter;
-    MobicomMessageTemplate messageTemplate;
-    MobicomMessageTemplateAdapter templateAdapter;
-    boolean isAlreadyLoading;
 
     public static int dp(float value) {
         return (int) Math.ceil(1 * value);
@@ -318,7 +320,7 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
 
     }
 
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View list = inflater.inflate(R.layout.mobicom_message_list, container, false);
         recyclerView = (RecyclerView) list.findViewById(R.id.messageList);
@@ -746,7 +748,8 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 if (recyclerDetailConversationAdapter != null) {
-                    recyclerDetailConversationAdapter.contactImageLoader.setPauseWork(newState == RecyclerView.SCROLL_STATE_DRAGGING);
+                    recyclerDetailConversationAdapter.contactImageLoader.
+                            setPauseWork(newState == RecyclerView.SCROLL_STATE_DRAGGING);
                 }
             }
 

@@ -548,7 +548,8 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
     }
 
     public void checkForEmptyConversations() {
-        boolean isLodingConversation = (downloadConversation != null && downloadConversation.getStatus() == AsyncTask.Status.RUNNING);
+        boolean isLodingConversation = (downloadConversation != null &&
+                downloadConversation.getStatus() == AsyncTask.Status.RUNNING);
         if (latestMessageForEachContact.isEmpty() && !isLodingConversation) {
 
             /*emptyTextView.setVisibility(View.VISIBLE);
@@ -1069,6 +1070,7 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
     }
 
     private class SyncMessages extends AsyncTask<Void, Integer, Long> {
+
         SyncMessages() {
         }
 

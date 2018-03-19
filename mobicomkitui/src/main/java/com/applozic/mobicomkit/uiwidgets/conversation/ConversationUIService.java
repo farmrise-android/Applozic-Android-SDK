@@ -149,7 +149,8 @@ public class ConversationUIService {
 
     public ConversationFragment getConversationFragment() {
 
-        ConversationFragment conversationFragment = (ConversationFragment) UIService.getFragmentByTag(fragmentActivity, CONVERSATION_FRAGMENT);
+        ConversationFragment conversationFragment = (ConversationFragment) UIService.getFragmentByTag
+                (fragmentActivity, CONVERSATION_FRAGMENT);
 
         if (conversationFragment == null) {
             Contact contact = ((ConversationActivity) fragmentActivity).getContact();
