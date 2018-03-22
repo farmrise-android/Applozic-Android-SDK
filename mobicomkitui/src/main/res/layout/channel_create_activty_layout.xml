@@ -40,7 +40,7 @@
         android:background="@color/apploizc_transparent_color"
         android:clickable="true"
         android:src="@drawable/applozic_ic_action_camera_new"/>
-        <!--android:src="@drawable/applozic_ic_action_camera_new" />-->
+
 
     <EditText
         android:id="@+id/channelName"

@@ -104,6 +104,7 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
     private ProgressBar progressBar;
     //private SearchView searchView;
     private SearchListFragment searchListFragment;
+    private Menu menu;
 
     public RecyclerView getRecyclerView() {
         return recyclerView;
@@ -234,6 +235,8 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
         recyclerView.setLongClickable(true);
         registerForContextMenu(recyclerView);
 
+        syncCallService.syncMessages(null);
+
         return list;
     }
 
@@ -246,14 +249,15 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
         };
     }
 
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // super.onCreateOptionsMenu(menu, inflater);
 
         toolbar.inflateMenu(R.menu.mobicom_basic_menu_for_normal_message);
-
+        this.menu = menu;
         MenuItem searchItem = menu.findItem(R.id.menu_search);
-        searchItem.setVisible(true);
+        //searchItem.setVisible(true);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setQueryHint(getResources().getString(R.string.search_hint));
         if (Utils.hasICS()) {
@@ -327,6 +331,9 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
                 emptyTextView.setVisibility(View.GONE);
                 emptyTextView.setText(!TextUtils.isEmpty(alCustomizationSettings.getNoConversationLabel()) ? alCustomizationSettings.getNoConversationLabel() : getResources().getString(R.string.no_conversation));
                 // startQNewButton.setVisibility(View.GONE);
+
+                menu.findItem(R.id.start_new).setVisible(true);
+                menu.findItem(R.id.menu_search).setVisible(true);
             }
         });
     }
@@ -561,6 +568,9 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
 
             emptyTextView.setVisibility(View.GONE);
             startChatLayout.setVisibility(View.VISIBLE);
+
+            menu.findItem(R.id.start_new).setVisible(false);
+            menu.findItem(R.id.menu_search).setVisible(false);
 
             //startNewButton.setVisibility(applozicSetting.isStartNewButtonVisible() ? View.VISIBLE : View.GONE);
         } else {
@@ -806,6 +816,7 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
         } */ else if (id == R.id.refresh) {
             Toast.makeText(getActivity(), getString(R.string.info_message_sync), Toast.LENGTH_LONG).show();
             //new ConversationActivity.SyncMessagesAsyncTask(this).execute();
+            new SyncMessages().execute();
         } else if (id == R.id.shareOptions) {
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setAction(Intent.ACTION_SEND)
@@ -1014,6 +1025,11 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
                         emptyTextView.setVisibility(View.GONE);
                         startChatLayout.setVisibility(View.GONE);
 
+                        if(messageList.size()>0){
+                            menu.findItem(R.id.start_new).setVisible(true);
+                            menu.findItem(R.id.menu_search).setVisible(true);
+                        }
+
 /*
                         if(messageList.isEmpty()){
                             emptyTextView.setVisibility(View.GONE);
@@ -1044,6 +1060,9 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
 
                             emptyTextView.setVisibility(View.GONE);
                             startChatLayout.setVisibility(View.VISIBLE);
+
+                            menu.findItem(R.id.start_new).setVisible(false);
+                            menu.findItem(R.id.menu_search).setVisible(false);
                         }
                     }
                 }

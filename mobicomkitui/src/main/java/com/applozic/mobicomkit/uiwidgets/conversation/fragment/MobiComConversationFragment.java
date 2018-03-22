@@ -2653,7 +2653,7 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
         BroadcastService.currentConversationId = null;
         if (typingStarted) {
             //app is crashing here when it is |
-            if (contact != null || channel != null && !Channel.GroupType.OPEN.getValue().equals(channel.getType()) || contact != null) {
+            if (contact != null | channel != null && !Channel.GroupType.OPEN.getValue().equals(channel.getType()) || contact != null) {
                 Intent intent = new Intent(getActivity(), ApplozicMqttIntentService.class);
                 intent.putExtra(ApplozicMqttIntentService.CHANNEL, channel);
                 intent.putExtra(ApplozicMqttIntentService.CONTACT, contact);

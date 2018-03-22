@@ -476,16 +476,22 @@ public class QuickConversationAdapter extends RecyclerView.Adapter implements Fi
 
             for (int i = 0; i < menuItems.length; i++) {
 
-                if ((message.getGroupId() == null || (channel != null && Channel.GroupType.GROUPOFTWO.getValue().equals(channel.getType()))) && (menuItems[i].equals(context.getResources().getString(R.string.delete_group)) ||
-                        menuItems[i].equals(context.getResources().getString(R.string.exit_group)))) {
+                if ((message.getGroupId() == null ||
+                        (channel != null &&
+                        Channel.GroupType.GROUPOFTWO.getValue().equals(channel.getType())))
+                        && (menuItems[i].equals(context.getResources().getString(R.string.delete_group))
+                        || menuItems[i].equals(context.getResources().getString(R.string.exit_group)))) {
                     continue;
                 }
 
-                if (menuItems[i].equals(context.getResources().getString(R.string.exit_group)) && (isChannelDeleted || !isUserPresentInGroup)) {
+                if (menuItems[i].equals(context.getResources().getString(R.string.exit_group)) && (isChannelDeleted ||
+                        !isUserPresentInGroup)) {
                     continue;
                 }
 
-                if (menuItems[i].equals(context.getResources().getString(R.string.delete_group)) && (isUserPresentInGroup || !isChannelDeleted)) {
+                if (menuItems[i].equals(context.getResources().getString(R.string.delete_group)) &&
+                        (isUserPresentInGroup || !isChannelDeleted)) {
+
                     continue;
                 }
                 if (menuItems[i].equals(context.getResources().getString(R.string.delete_conversation)) && !alCustomizationSettings.isDeleteOption()) {

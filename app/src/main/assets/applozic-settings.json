@@ -35,7 +35,7 @@
   "noSearchFoundForChatMessages": "No conversation found",
   "totalRegisteredUserToFetch": 100,
   "maxAttachmentAllowed": 10,
-  "maxAttachmentSizeAllowed": 30,
+  "maxAttachmentSizeAllowed": 50,
   "totalOnlineUsers": 0,
   "defaultGroupType": 2,
   "conversationContactImageVisibility": false,

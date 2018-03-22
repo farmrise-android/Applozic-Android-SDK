@@ -449,11 +449,11 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         };
 
         User user = new User();
-        user.setUserId("montest");
+        user.setUserId("testapplozicuser5"); //testapplozicuser1
         //user.setEmail("pskreddy"@gmail.com);
-        user.setContactNumber("7109109100");
-        user.setPassword("7109109100");
-        user.setDisplayName("7109109100");
+        user.setContactNumber("8298298295"); //8298298290
+        user.setPassword("8298298295");
+        user.setDisplayName("Sai4"); //display name and user name are similar //Sai //In all contacts, conatct shows with display name and number
         //user.setAuthenticationTypeId(authenticationType.getValue());
 
 

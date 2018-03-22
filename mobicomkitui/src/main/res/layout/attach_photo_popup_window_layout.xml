@@ -16,12 +16,13 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/applozic_ic_image_photo_album" />
+            android:src="@drawable/applozic_ic_image_photo_album"
+            android:layout_gravity="center"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
+            android:layout_gravity="center"
             android:text="@string/gallery"
             android:textColor="@color/white"
             android:textSize="20sp" />
@@ -40,7 +41,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
+            android:layout_gravity="center"
             android:src="@drawable/applozic_ic_image_camera_alt" />
 
         <TextView
