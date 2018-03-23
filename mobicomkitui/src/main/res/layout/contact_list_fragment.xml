@@ -3,40 +3,130 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Use standard android.R class list id instead of app specific id. This is just useful for
-         consistency. -->
     <ListView
         android:id="@id/android:list"
         style="@style/ContactListView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <LinearLayout
-        android:id="@id/android:empty"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical">
 
-        <TextView
+    <!-- <TextView
+         android:id="@+id/result"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:fontFamily="notosans-regular"
+         android:layout_centerInParent="true"
+         android:gravity="center"
+         android:text="@string/no_contacts"
+         android:textAppearance="?android:attr/textAppearanceLarge"
+         />-->
+
+    <!--android:fontFamily="sans-serif-light"-->
+
+    <!-- <LinearLayout
+         android:id="@id/android:empty"
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+         android:gravity="center"
+         android:orientation="vertical">
+
+         <TextView
+             android:id="@+id/result"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:fontFamily="sans-serif-light"
+             android:gravity="center"
+             android:text="@string/no_contacts"
+             android:textAppearance="?android:attr/textAppearanceLarge" />
+
+         <Button
+             android:id="@+id/actionButton"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:fontFamily="sans-serif-light"
+             android:gravity="center"
+             android:text="@string/invite"
+             android:textAppearance="?android:attr/textAppearanceLarge"
+             android:visibility="gone" />
+
+     </LinearLayout>-->
+
+    <RelativeLayout
+        android:id="@+id/rLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <RelativeLayout
+            android:id="@+id/startInviteLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/img_Invite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/mobicom_ic_launcher"
+                android:layout_centerHorizontal="true"
+                android:padding="16dp"
+                android:layout_marginBottom="20dp" />
+
+
+            <TextView
+                android:id="@+id/inviteFriend"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_margin="4dp"
+                android:text="Invite a friend"
+                android:textColor="#000000"
+                android:textSize="20sp"
+                android:fontFamily="notosans-regular"
+                android:layout_below="@+id/img_Invite" />
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_margin="16dp"
+                android:text="Looks like none of your friends are here. Invite your friends to enjoy chatting"
+                android:textSize="14sp"
+                android:textColor="#FF666666"
+                android:layout_below="@+id/inviteFriend" />
+
+            <Button
+                android:id="@+id/actionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_rounded"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@+id/textView1"
+                android:layout_marginTop="32dp"
+                android:textAllCaps="false"
+                android:text="Invite"
+                android:textSize="16sp"
+                android:textColor="#ffffff"
+                android:paddingLeft="48dp"
+                android:paddingRight="48dp" />
+
+        </RelativeLayout>
+
+        <com.applozic.mobicomkit.uiwidgets.CustomTextViewRegular
             android:id="@+id/result"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-light"
+            android:layout_centerInParent="true"
             android:gravity="center"
             android:text="@string/no_contacts"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-
-        <Button
-            android:id="@+id/actionButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-light"
-            android:gravity="center"
-            android:text="@string/invite"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:visibility="gone" />
+            android:visibility="gone"/>
 
-    </LinearLayout>
+    </RelativeLayout>
+
+    <!-- Use standard android.R class list id instead of app specific id. This is just useful for
+        consistency. -->
+
 
 </FrameLayout>

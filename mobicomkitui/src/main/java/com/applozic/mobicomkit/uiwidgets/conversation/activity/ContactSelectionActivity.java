@@ -134,6 +134,7 @@ public class ContactSelectionActivity extends AppCompatActivity implements Searc
         if (disableCheckBox) {
             menu.removeItem(R.id.Done);
         }
+
         MenuItem searchItem = menu.findItem(R.id.menu_search);
         searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setQueryHint(getResources().getString(R.string.search_hint));

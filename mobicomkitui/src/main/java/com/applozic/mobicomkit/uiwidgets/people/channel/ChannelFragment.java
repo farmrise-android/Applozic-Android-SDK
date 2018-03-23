@@ -26,6 +26,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AlphabetIndexer;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
 
@@ -61,10 +62,11 @@ public class ChannelFragment extends ListFragment implements
     // Contact selected listener that allows the activity holding this fragment to be notified of
 // a contact being selected
     private OnContactsInteractionListener mOnChannelSelectedListener;
-    private Button shareButton;
+    // private Button shareButton;
     private TextView resultTextView;
     private boolean syncStatus = true;
     private int mPreviouslySelectedSearchItem = 0;
+    RelativeLayout startInviteLayout;
 
     public ChannelFragment() {
 
@@ -110,9 +112,15 @@ public class ChannelFragment extends ListFragment implements
                              Bundle savedInstanceState) {
         // Inflate the list fragment layout
         View view = inflater.inflate(R.layout.contact_list_fragment, container, false);
-        shareButton = (Button) view.findViewById(R.id.actionButton);
-        shareButton.setVisibility(View.GONE);
+        //shareButton = (Button) view.findViewById(R.id.actionButton);
+        //shareButton.setVisibility(View.GONE);
+
+        startInviteLayout = (RelativeLayout) view.findViewById(R.id.startInviteLayout);
+        startInviteLayout.setVisibility(View.GONE);
+
+
         resultTextView = (TextView) view.findViewById(R.id.result);
+        resultTextView.setVisibility(View.VISIBLE);
         resultTextView.setText(getString(R.string.no_groups));
         return view;
     }
@@ -135,7 +143,7 @@ public class ChannelFragment extends ListFragment implements
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        shareButton.setOnClickListener(new View.OnClickListener() {
+        /*shareButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_SEND)
@@ -159,7 +167,7 @@ public class ChannelFragment extends ListFragment implements
                     startActivity(chooserIntent);
                 }
             }
-        });
+        });*/
 
         setListAdapter(mAdapter);
         getListView().setOnItemClickListener(this);
@@ -297,9 +305,22 @@ public class ChannelFragment extends ListFragment implements
          */
         private int indexOfSearchQuery(String displayName) {
             if (!TextUtils.isEmpty(mSearchTerm)) {
-                return displayName.toLowerCase(Locale.getDefault()).indexOf(
-                        mSearchTerm.toLowerCase(Locale.getDefault()));
+                resultTextView.setVisibility(View.VISIBLE);
+                resultTextView.setText(R.string.no_groups);
+                return displayName.toLowerCase(Locale.getDefault()).indexOf(mSearchTerm.toLowerCase(Locale.getDefault()));
+            }else{
+                resultTextView.setVisibility(View.GONE);
+                //resultTextView.setText("No Groups");
             }
+
+            if(displayName!=null){
+                resultTextView.setVisibility(View.GONE);
+            }else{
+                resultTextView.setVisibility(View.VISIBLE);
+                resultTextView.setText(R.string.no_groups);
+            }
+
+
             return -1;
         }
 

@@ -19,6 +19,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.widget.AppCompatCheckBox;
+import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.TextAppearanceSpan;
@@ -35,6 +36,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AlphabetIndexer;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -70,7 +72,6 @@ import com.applozic.mobicommons.file.FileUtils;
 import com.applozic.mobicommons.json.GsonUtils;
 import com.applozic.mobicommons.people.SearchListFragment;
 import com.applozic.mobicommons.people.channel.Channel;
-import com.applozic.mobicommons.people.channel.ChannelMetadata;
 import com.applozic.mobicommons.people.contact.Contact;
 
 import java.util.ArrayList;
@@ -101,6 +102,8 @@ public class ContactSelectionFragment extends ListFragment implements SearchList
     MobiComUserPreference userPreference;
     AlCustomizationSettings alCustomizationSettings;
     String contactsGroupId;
+    RefreshContactsScreenBroadcast refreshContactsScreenBroadcast;
+    RelativeLayout startInviteLayout;
     private String mSearchTerm; // Stores the current search query term
     private ContactsAdapter mAdapter;
     private boolean isScrolling = false;
@@ -117,7 +120,7 @@ public class ContactSelectionFragment extends ListFragment implements SearchList
     private String[] groupContacts;
     private Bundle bundle;
     private List<String> userIdList;
-    RefreshContactsScreenBroadcast refreshContactsScreenBroadcast;
+    private TextView resultTextView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -185,7 +188,7 @@ public class ContactSelectionFragment extends ListFragment implements SearchList
             } else if (groupContacts != null) {
                 getLoaderManager().initLoader(ContactsQuery.QUERY_ID, null, ContactSelectionFragment.this);
             }
-        }else if (MobiComUserPreference.getInstance(getContext()).getContactGroupIdList() != null && !MobiComUserPreference.getInstance(getContext()).getContactGroupIdList().isEmpty()) {
+        } else if (MobiComUserPreference.getInstance(getContext()).getContactGroupIdList() != null && !MobiComUserPreference.getInstance(getContext()).getContactGroupIdList().isEmpty()) {
             List<String> groupList = new ArrayList<String>();
             groupList.addAll(MobiComUserPreference.getInstance(getContext()).getContactGroupIdList());
 
@@ -237,6 +240,7 @@ public class ContactSelectionFragment extends ListFragment implements SearchList
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
         setListAdapter(mAdapter);
         getListView().setOnItemClickListener(this);
         getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -381,73 +385,94 @@ public class ContactSelectionFragment extends ListFragment implements SearchList
                              Bundle savedInstanceState) {
         // Inflate the list fragment layout
         View view = inflater.inflate(R.layout.contact_list_fragment, container, false);
+        /*
         Button shareButton = (Button) view.findViewById(R.id.actionButton);
-        shareButton.setVisibility(alCustomizationSettings.isInviteFriendsInContactActivity() ? View.VISIBLE : View.GONE);
-        TextView resultTextView = (TextView) view.findViewById(R.id.result);
+        shareButton.setVisibility(alCustomizationSettings.isInviteFriendsInContactActivity() ? View.VISIBLE : View.GONE);*/
+
+        startInviteLayout = (RelativeLayout) view.findViewById(R.id.startInviteLayout);
+        startInviteLayout.setVisibility(View.VISIBLE);
+
+        Button btn_invite = (Button) view.findViewById(R.id.actionButton);
+        btn_invite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getActivity(), "Invite", Toast.LENGTH_LONG).show();
+            }
+        });
+
+
+
+        resultTextView = (TextView) view.findViewById(R.id.result);
         return view;
+
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         int id = item.getItemId();
         if (id == R.id.Done) {
             if (userIdList != null && userIdList.size() == 0) {
                 Toast.makeText(getActivity(), R.string.select_at_least, Toast.LENGTH_SHORT).show();
             } else {
                 final ProgressDialog progressDialog = ProgressDialog.show(getActivity(), "",
-                        getActivity().getString(TextUtils.isEmpty(channelName) ? R.string.broadcast_creating_info : R.string.group_creating_info), true);
-                AlChannelCreateAsyncTask.TaskListenerInterface taskListenerInterface = new AlChannelCreateAsyncTask.TaskListenerInterface() {
-                    @Override
-                    public void onSuccess(Channel channel, Context context) {
-                        if (progressDialog != null && progressDialog.isShowing()) {
-                            progressDialog.dismiss();
-                        }
-                        if (channel != null) {
-                            Intent intent = new Intent(getActivity(), ConversationActivity.class);
-                            if (ApplozicClient.getInstance(getActivity().getApplicationContext()).isContextBasedChat()) {
-                                intent.putExtra(ConversationUIService.CONTEXT_BASED_CHAT, true);
-                            }
-                            intent.putExtra(ConversationUIService.GROUP_ID, channel.getKey());
-                            intent.putExtra(ConversationUIService.GROUP_NAME, channel.getName());
-                            getActivity().startActivity(intent);
-                        }
+                        getActivity().getString(TextUtils.isEmpty(channelName)
+                                ? R.string.broadcast_creating_info : R.string.group_creating_info), true);
 
-                        if (bundle != null && bundle.getString(CHANNEL) != null) {
-                            getActivity().sendBroadcast(new Intent(ChannelCreateActivity.ACTION_FINISH_CHANNEL_CREATE));
-                        }
-                        if (getActivity() != null) {
-                            getActivity().finish();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(ChannelFeedApiResponse channelFeedApiResponse, Context context) {
-                        if (progressDialog != null && progressDialog.isShowing()) {
-                            progressDialog.dismiss();
-                        }
-                        if (channelFeedApiResponse != null) {
-                            List<ErrorResponseFeed> error = channelFeedApiResponse.getErrorResponse();
-                            if (error != null && error.size() > 0) {
-                                ErrorResponseFeed errorResponseFeed = error.get(0);
-                                String errorDescription = errorResponseFeed.getDescription();
-                                if (!TextUtils.isEmpty(errorDescription)) {
-                                    if (MobiComKitConstants.GROUP_USER_LIMIT_EXCEED.equalsIgnoreCase(errorDescription)) {
-                                        Toast.makeText(context, R.string.group_members_limit_exceeds, Toast.LENGTH_SHORT).show();
-                                    } else {
-                                        Toast.makeText(context, R.string.applozic_server_error, Toast.LENGTH_SHORT).show();
+                AlChannelCreateAsyncTask.TaskListenerInterface taskListenerInterface =
+                        new AlChannelCreateAsyncTask.TaskListenerInterface() {
+                            @Override
+                            public void onSuccess(Channel channel, Context context) {
+                                if (progressDialog != null && progressDialog.isShowing()) {
+                                    progressDialog.dismiss();
+                                }
+                                if (channel != null) {
+                                    Intent intent = new Intent(getActivity(), ConversationActivity.class);
+                                    if (ApplozicClient.getInstance(getActivity().getApplicationContext()).isContextBasedChat()) {
+                                        intent.putExtra(ConversationUIService.CONTEXT_BASED_CHAT, true);
                                     }
+                                    intent.putExtra(ConversationUIService.GROUP_ID, channel.getKey());
+                                    intent.putExtra(ConversationUIService.GROUP_NAME, channel.getName());
+                                    getActivity().startActivity(intent);
+                                }
+
+                                if (bundle != null && bundle.getString(CHANNEL) != null) {
+                                    getActivity().sendBroadcast(new Intent(ChannelCreateActivity.ACTION_FINISH_CHANNEL_CREATE));
+                                }
+                                if (getActivity() != null) {
+                                    getActivity().finish();
                                 }
                             }
-                        } else {
-                            Toast.makeText(context, Utils.isInternetAvailable(context) ? R.string.applozic_server_error : R.string.you_dont_have_any_network_access_info, Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                };
+
+                            @Override
+                            public void onFailure(ChannelFeedApiResponse channelFeedApiResponse, Context context) {
+                                if (progressDialog != null && progressDialog.isShowing()) {
+                                    progressDialog.dismiss();
+                                }
+                                if (channelFeedApiResponse != null) {
+                                    List<ErrorResponseFeed> error = channelFeedApiResponse.getErrorResponse();
+                                    if (error != null && error.size() > 0) {
+                                        ErrorResponseFeed errorResponseFeed = error.get(0);
+                                        String errorDescription = errorResponseFeed.getDescription();
+                                        if (!TextUtils.isEmpty(errorDescription)) {
+                                            if (MobiComKitConstants.GROUP_USER_LIMIT_EXCEED.equalsIgnoreCase(errorDescription)) {
+                                                Toast.makeText(context, R.string.group_members_limit_exceeds, Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                Toast.makeText(context, R.string.applozic_server_error, Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    Toast.makeText(context, Utils.isInternetAvailable(context) ? R.string.applozic_server_error : R.string.you_dont_have_any_network_access_info, Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        };
 
                 if (userIdList != null && userIdList.size() > 0) {
                     if (TextUtils.isEmpty(channelName)) {
@@ -511,6 +536,7 @@ public class ContactSelectionFragment extends ListFragment implements SearchList
         }
     }
 
+
     @Override
     public boolean onQueryTextChange(String newText) {
         // Called when the action bar search text has changed.  Updates
@@ -528,6 +554,22 @@ public class ContactSelectionFragment extends ListFragment implements SearchList
         return true;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (refreshContactsScreenBroadcast != null) {
+            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(refreshContactsScreenBroadcast, new IntentFilter(BroadcastService.INTENT_ACTIONS.UPDATE_USER_DETAIL.toString()));
+        }
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (refreshContactsScreenBroadcast != null) {
+            LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(refreshContactsScreenBroadcast);
+        }
+    }
 
     /**
      * This interface defines constants for the Cursor and CursorLoader, based on constants defined
@@ -586,9 +628,29 @@ public class ContactSelectionFragment extends ListFragment implements SearchList
          */
         private int indexOfSearchQuery(String displayName) {
             if (!TextUtils.isEmpty(mSearchTerm)) {
+                resultTextView.setVisibility(View.VISIBLE);
+                resultTextView.setText(R.string.no_contacts);
+                startInviteLayout.setVisibility(View.GONE);
+
                 return displayName.toLowerCase(Locale.getDefault()).indexOf(
                         mSearchTerm.toLowerCase(Locale.getDefault()));
+            } else {
+                resultTextView.setVisibility(View.GONE);
+
             }
+
+            if (displayName != null) {
+                resultTextView.setVisibility(View.GONE);
+                startInviteLayout.setVisibility(View.GONE);
+
+            } else {
+                resultTextView.setVisibility(View.GONE);
+                resultTextView.setText(R.string.no_contacts);
+                startInviteLayout.setVisibility(View.VISIBLE);
+
+
+            }
+
             return -1;
         }
 
@@ -772,7 +834,6 @@ public class ContactSelectionFragment extends ListFragment implements SearchList
         TextView textView2;
     }
 
-
     private final class RefreshContactsScreenBroadcast extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -788,23 +849,6 @@ public class ContactSelectionFragment extends ListFragment implements SearchList
                     }
                 }
             }
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (refreshContactsScreenBroadcast != null) {
-            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(refreshContactsScreenBroadcast, new IntentFilter(BroadcastService.INTENT_ACTIONS.UPDATE_USER_DETAIL.toString()));
-        }
-
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (refreshContactsScreenBroadcast != null) {
-            LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(refreshContactsScreenBroadcast);
         }
     }
 

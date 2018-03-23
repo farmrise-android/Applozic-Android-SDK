@@ -29,6 +29,7 @@ import com.applozic.mobicomkit.api.conversation.ApplozicMqttIntentService;
 import com.applozic.mobicomkit.api.conversation.Message;
 import com.applozic.mobicomkit.api.people.UserIntentService;
 import com.applozic.mobicomkit.broadcast.BroadcastService;
+import com.applozic.mobicomkit.contact.AppContactService;
 import com.applozic.mobicomkit.contact.database.ContactDatabase;
 import com.applozic.mobicomkit.uiwidgets.ApplozicSetting;
 import com.applozic.mobicomkit.uiwidgets.conversation.ConversationUIService;
@@ -110,6 +111,9 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         initialize();
+
+        //Put Support Contact Data
+        //buildSupportContactData();
 
         //Manually displaying the first fragment - one time only
         bottomNavigationView.setSelectedItemId(R.id.action_home);
@@ -449,11 +453,11 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         };
 
         User user = new User();
-        user.setUserId("testapplozicuser5"); //testapplozicuser1
+        user.setUserId("testapplozicuser7");
         //user.setEmail("pskreddy"@gmail.com);
-        user.setContactNumber("8298298295"); //8298298290
-        user.setPassword("8298298295");
-        user.setDisplayName("Sai4"); //display name and user name are similar //Sai //In all contacts, conatct shows with display name and number
+        user.setContactNumber("7777777777");
+        user.setPassword("7777777777");
+        user.setDisplayName("Seven"); //display name and user name are similar //Sai //In all contacts, conatct shows with display name and number
         //user.setAuthenticationTypeId(authenticationType.getValue());
 
 
@@ -470,11 +474,15 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                 intent.putExtra(ConversationUIService.SEARCH_STRING, "");
                 intent.putExtra(ConversationUIService.TAKE_ORDER, true);
                 String userId = data.getStringExtra(ConversationUIService.USER_ID);
+                Integer groupId = data.getIntExtra(ConversationUIService.GROUP_ID, 0);
                 Contact contact = new ContactDatabase(this).getContactById(userId);
 
                 if (contact != null) {
                     intent.putExtra(ConversationUIService.USER_ID, contact.getUserId());
                     intent.putExtra(ConversationUIService.DISPLAY_NAME, contact.getDisplayName());
+                    startActivity(intent);
+                } else if (groupId != 0) {
+                    intent.putExtra(ConversationUIService.GROUP_ID, groupId);
                     startActivity(intent);
                 }
             }
@@ -533,6 +541,21 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                 // beginCrop(imageUri);
                 break;
 
+        }
+    }
+
+    private void buildSupportContactData() {
+        Context context = getApplicationContext();
+        AppContactService appContactService = new AppContactService(context);
+        // avoid each time update ....
+        if (!appContactService.isContactExists(getString(R.string.support_contact_userId))) {
+            Contact contact = new Contact();
+            contact.setUserId(getString(R.string.support_contact_userId));
+            contact.setFullName(getString(R.string.support_contact_display_name));
+            contact.setContactNumber(getString(R.string.support_contact_number));
+            contact.setImageURL(getString(R.string.support_contact_image_url));
+            contact.setEmailId(getString(R.string.support_contact_emailId));
+            appContactService.add(contact);
         }
     }
 

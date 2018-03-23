@@ -8,12 +8,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -45,8 +43,8 @@ import com.applozic.mobicomkit.contact.AppContactService;
 import com.applozic.mobicomkit.contact.BaseContactService;
 import com.applozic.mobicomkit.contact.database.ContactDatabase;
 import com.applozic.mobicomkit.feed.RegisteredUsersApiResponse;
-import com.applozic.mobicomkit.uiwidgets.ApplozicSetting;
 import com.applozic.mobicomkit.uiwidgets.AlCustomizationSettings;
+import com.applozic.mobicomkit.uiwidgets.ApplozicSetting;
 import com.applozic.mobicomkit.uiwidgets.R;
 import com.applozic.mobicomkit.uiwidgets.alphanumbericcolor.AlphaNumberColorUtil;
 import com.applozic.mobicomkit.uiwidgets.async.AlGetMembersFromContactGroupListTask;
@@ -86,6 +84,7 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
     private static String inviteMessage;
     AlCustomizationSettings alCustomizationSettings;
     RefreshContactsScreenBroadcast refreshContactsScreenBroadcast;
+    RelativeLayout startInviteLayout;
     private ContactsAdapter mAdapter; // The main query adapter
     private ImageLoader mImageLoader; // Handles loading the contact image in a background thread
     private String mSearchTerm; // Stores the current search query term
@@ -96,7 +95,7 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
 // can be reselected again
     private int mPreviouslySelectedSearchItem = 0;
     private BaseContactService contactService;
-    private Button shareButton;
+    //private Button shareButton;
     private TextView resultTextView;
     private String[] userIdArray;
     private MobiComUserPreference userPreference;
@@ -164,10 +163,14 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
 
                     }
                 };
-                ApplozicGetMemberFromContactGroupTask applozicGetMemberFromContactGroupTask = new ApplozicGetMemberFromContactGroupTask(getActivity(), MobiComUserPreference.getInstance(context).getContactsGroupId(), String.valueOf(Channel.GroupType.CONTACT_GROUP.getValue()), eventMemberListener);
+                ApplozicGetMemberFromContactGroupTask applozicGetMemberFromContactGroupTask =
+                        new ApplozicGetMemberFromContactGroupTask(getActivity(),
+                                MobiComUserPreference.getInstance(context).getContactsGroupId(),
+                                String.valueOf(Channel.GroupType.CONTACT_GROUP.getValue()), eventMemberListener);
                 applozicGetMemberFromContactGroupTask.execute();
             } else if (userIdArray != null) {
-                getLoaderManager().initLoader(ContactSelectionFragment.ContactsQuery.QUERY_ID, null, AppContactFragment.this);
+                getLoaderManager().initLoader(ContactSelectionFragment.ContactsQuery.QUERY_ID,
+                        null, AppContactFragment.this);
             }
         } else if (MobiComUserPreference.getInstance(getContext()).getContactGroupIdList() != null && !MobiComUserPreference.getInstance(getContext()).getContactGroupIdList().isEmpty()) {
             List<String> groupList = new ArrayList<String>();
@@ -206,8 +209,21 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
                              Bundle savedInstanceState) {
         // Inflate the list fragment layout
         View view = inflater.inflate(R.layout.contact_list_fragment, container, false);
-        shareButton = (Button) view.findViewById(R.id.actionButton);
-        shareButton.setVisibility(alCustomizationSettings.isInviteFriendsInContactActivity() ? View.VISIBLE : View.GONE);
+        //shareButton = (Button) view.findViewById(R.id.actionButton);
+
+        //shareButton.setVisibility(alCustomizationSettings.isInviteFriendsInContactActivity() ? View.VISIBLE : View.GONE);
+
+        startInviteLayout = (RelativeLayout) view.findViewById(R.id.startInviteLayout);
+        startInviteLayout.setVisibility(View.VISIBLE);
+
+        Button btn_invite = (Button) view.findViewById(R.id.actionButton);
+        btn_invite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getActivity(), "Invite", Toast.LENGTH_LONG).show();
+            }
+        });
+
         resultTextView = (TextView) view.findViewById(R.id.result);
         return view;
     }
@@ -216,7 +232,9 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        shareButton.setOnClickListener(new View.OnClickListener() {
+
+
+        /*shareButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_SEND)
@@ -240,7 +258,7 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
                     startActivity(chooserIntent);
                 }
             }
-        });
+        });*/
 
         setListAdapter(mAdapter);
         getListView().setOnItemClickListener(this);
@@ -252,44 +270,6 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
         if (mPreviouslySelectedSearchItem == 0 && TextUtils.isEmpty(userPreference.getContactsGroupId()) && userPreference.getContactGroupIdList() == null) {
             // Initialize the loader, and create a loader identified by ContactsQuery.QUERY_ID
             getLoaderManager().initLoader(ContactsQuery.QUERY_ID, null, this);
-        }
-    }
-
-    public class EndlessScrollListener implements AbsListView.OnScrollListener {
-
-        private int visibleThreshold = 5;
-        private int currentPage = 0;
-        private int previousTotal = 0;
-        private boolean loading = true;
-
-        public EndlessScrollListener() {
-        }
-
-        public EndlessScrollListener(int visibleThreshold) {
-            this.visibleThreshold = visibleThreshold;
-        }
-
-        @Override
-        public void onScroll(AbsListView view, int firstVisibleItem,
-                             int visibleItemCount, int totalItemCount) {
-            if (loading &&
-                    ((alCustomizationSettings.isRegisteredUserContactListCall() || ApplozicSetting.getInstance(getActivity()).isRegisteredUsersContactCall()) && Utils.isInternetAvailable(getActivity().getApplicationContext()) && TextUtils.isEmpty(userPreference.getContactsGroupId())) &&
-                    (totalItemCount > previousTotal)) {
-                loading = false;
-                previousTotal = totalItemCount;
-                currentPage++;
-
-            }
-            if ((!loading && (totalItemCount - visibleItemCount) <= (firstVisibleItem + visibleThreshold)) && (!MobiComKitPeopleActivity.isSearching)) {
-                // I load the next page of gigs using a background task,
-                // but you can call any function here.
-                processLoadRegisteredUsers();
-                loading = true;
-            }
-        }
-
-        @Override
-        public void onScrollStateChanged(AbsListView view, int scrollState) {
         }
     }
 
@@ -460,7 +440,9 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
 
             }
         };
-        RegisteredUsersAsyncTask usersAsyncTask = new RegisteredUsersAsyncTask(getActivity(), usersAsyncTaskTaskListener, alCustomizationSettings.getTotalRegisteredUserToFetch(), userPreference.getRegisteredUsersLastFetchTime(), null, null, true);
+        RegisteredUsersAsyncTask usersAsyncTask = new RegisteredUsersAsyncTask(getActivity(),
+                usersAsyncTaskTaskListener, alCustomizationSettings.getTotalRegisteredUserToFetch(),
+                userPreference.getRegisteredUsersLastFetchTime(), null, null, true);
         usersAsyncTask.execute((Void) null);
     }
 
@@ -481,7 +463,6 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
         }
     }
 
-
     /**
      * This interface defines constants for the Cursor and CursorLoader, based on constants defined
      * in the {@link android.provider.ContactsContract.Contacts} class.
@@ -490,6 +471,48 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
         // An identifier for the loader
         int QUERY_ID = 1;
 
+    }
+
+    public class EndlessScrollListener implements AbsListView.OnScrollListener {
+
+        private int visibleThreshold = 5;
+        private int currentPage = 0;
+        private int previousTotal = 0;
+        private boolean loading = true;
+
+        public EndlessScrollListener() {
+        }
+
+        public EndlessScrollListener(int visibleThreshold) {
+            this.visibleThreshold = visibleThreshold;
+        }
+
+        @Override
+        public void onScroll(AbsListView view, int firstVisibleItem,
+                             int visibleItemCount, int totalItemCount) {
+            if (loading &&
+                    ((alCustomizationSettings.isRegisteredUserContactListCall() ||
+                            ApplozicSetting.getInstance(getActivity()).isRegisteredUsersContactCall())
+                            && Utils.isInternetAvailable(getActivity().getApplicationContext())
+                            && TextUtils.isEmpty(userPreference.getContactsGroupId())) &&
+                    (totalItemCount > previousTotal)) {
+                loading = false;
+                previousTotal = totalItemCount;
+                currentPage++;
+
+            }
+            if ((!loading && (totalItemCount - visibleItemCount) <= (firstVisibleItem + visibleThreshold))
+                    && (!MobiComKitPeopleActivity.isSearching)) {
+                // I load the next page of gigs using a background task,
+                // but you can call any function here.
+                processLoadRegisteredUsers();
+                loading = true;
+            }
+        }
+
+        @Override
+        public void onScrollStateChanged(AbsListView view, int scrollState) {
+        }
     }
 
     /**
@@ -542,9 +565,26 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
          */
         private int indexOfSearchQuery(String displayName) {
             if (!TextUtils.isEmpty(mSearchTerm)) {
+                resultTextView.setVisibility(View.VISIBLE);
+                resultTextView.setText(R.string.no_contacts);
+                startInviteLayout.setVisibility(View.GONE);
                 return displayName.toLowerCase(Locale.getDefault()).indexOf(
                         mSearchTerm.toLowerCase(Locale.getDefault()));
+            } else {
+                resultTextView.setVisibility(View.GONE);
             }
+
+            if (displayName != null) {
+                resultTextView.setVisibility(View.GONE);
+                startInviteLayout.setVisibility(View.GONE);
+            } else {
+                resultTextView.setVisibility(View.GONE);
+                resultTextView.setText(R.string.no_contacts);
+                startInviteLayout.setVisibility(View.VISIBLE);
+
+            }
+
+
             return -1;
         }
 
