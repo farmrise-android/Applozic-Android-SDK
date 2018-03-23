@@ -25,6 +25,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.applozic.mobicomkit.api.account.user.MobiComUserPreference;
+import com.applozic.mobicomkit.api.attachment.FileMeta;
 import com.applozic.mobicomkit.api.conversation.Message;
 import com.applozic.mobicomkit.api.conversation.database.MessageDatabaseService;
 import com.applozic.mobicomkit.api.notification.VideoCallNotificationHelper;
@@ -44,10 +45,12 @@ import com.applozic.mobicommons.commons.image.ImageLoader;
 import com.applozic.mobicommons.commons.image.ImageUtils;
 import com.applozic.mobicommons.emoticon.EmojiconHandler;
 import com.applozic.mobicommons.emoticon.EmoticonUtils;
+import com.applozic.mobicommons.file.FileUtils;
 import com.applozic.mobicommons.people.channel.Channel;
 import com.applozic.mobicommons.people.channel.ChannelUtils;
 import com.applozic.mobicommons.people.contact.Contact;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -93,10 +96,6 @@ public class QuickConversationAdapter extends RecyclerView.Adapter implements Fi
     private View view;
     private ConversationUIService conversationUIService;
 
-    public void setAlCustomizationSettings(AlCustomizationSettings alCustomizationSettings) {
-        this.alCustomizationSettings = alCustomizationSettings;
-    }
-
     public QuickConversationAdapter(final Context context, List<Message> messageList, EmojiconHandler emojiconHandler) {
         this.context = context;
         this.emojiconHandler = emojiconHandler;
@@ -125,6 +124,11 @@ public class QuickConversationAdapter extends RecyclerView.Adapter implements Fi
         highlightTextSpan = new TextAppearanceSpan(context, R.style.searchTextHiglight);
     }
 
+    public void setAlCustomizationSettings(AlCustomizationSettings alCustomizationSettings) {
+        this.alCustomizationSettings = alCustomizationSettings;
+    }
+
+    @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -139,7 +143,7 @@ public class QuickConversationAdapter extends RecyclerView.Adapter implements Fi
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (getItemViewType(position) == 2) {
             FooterViewHolder myHolder = (FooterViewHolder) holder;
             //myHolder.loadMoreProgressBar.setVisibility(View.GONE);
@@ -217,15 +221,30 @@ public class QuickConversationAdapter extends RecyclerView.Adapter implements Fi
                 }
                 if (message.isVideoCallMessage()) {
                     createVideoCallView(message, myholder.attachmentIcon, myholder.messageTextView);
-                } else if (message.hasAttachment() && myholder.attachmentIcon != null && !(message.getContentType() == Message.ContentType.TEXT_URL.getValue())) {
+                } else if (message.hasAttachment() && myholder.attachmentIcon != null &&
+                        !(message.getContentType() == Message.ContentType.TEXT_URL.getValue())) {
                     //Todo: handle it for fileKeyStrings when filePaths is empty
                     String filePath = message.getFileMetas() == null && message.getFilePaths() != null
                             ? message.getFilePaths().get(0).substring(message.getFilePaths().get(0).lastIndexOf("/") + 1) :
                             message.getFileMetas() != null ? message.getFileMetas().getName() : "";
-                    myholder.attachmentIcon.setVisibility(View.VISIBLE);
+                   /* myholder.attachmentIcon.setVisibility(View.VISIBLE);
                     myholder.attachmentIcon.setImageResource(R.drawable.applozic_ic_action_attachment);
-                    myholder.messageTextView.setText(filePath);
-                } else if (myholder.attachmentIcon != null && message.getContentType() == Message.ContentType.LOCATION.getValue()) {
+                    myholder.messageTextView.setText(filePath);*/
+
+                    if (message.getFileMetas() == null && message.getFilePaths() != null) {
+                        String mimType = FileUtils.getMimeType(new File(message.getFilePaths().get(0)));
+                        setUpAttachmentMessage(message.getMessage(), mimType, myholder.messageTextView,
+                                myholder.attachmentIcon);
+                    } else {
+                        FileMeta fileMeta = message.getFileMetas();
+                        if (fileMeta != null) {
+                            setUpAttachmentMessage(message.getMessage(), fileMeta.getContentType(),
+                                    myholder.messageTextView, myholder.attachmentIcon);
+                        }
+                    }
+
+                } else if (myholder.attachmentIcon != null && message.getContentType()
+                        == Message.ContentType.LOCATION.getValue()) {
                     myholder.attachmentIcon.setVisibility(View.VISIBLE);
                     myholder.attachmentIcon.setImageResource(R.drawable.mobicom_notification_location_icon);
                     myholder.messageTextView.setText(context.getString(R.string.Location));
@@ -234,10 +253,11 @@ public class QuickConversationAdapter extends RecyclerView.Adapter implements Fi
                 } else if (message.getContentType() == Message.ContentType.TEXT_HTML.getValue()) {
                     myholder.messageTextView.setText(Html.fromHtml(message.getMessage()));
                 } else {
-                    String messageSubString = (!TextUtils.isEmpty(message.getMessage()) ? message.getMessage().substring(0, Math.min(message.getMessage().length(), 50)) : "");
-                    myholder.messageTextView.setText(EmoticonUtils.getSmiledText(context, messageSubString, emojiconHandler));
+                    String messageSubString = (!TextUtils.isEmpty(message.getMessage()) ?
+                            message.getMessage().substring(0, Math.min(message.getMessage().length(), 50)) : "");
+                    myholder.messageTextView.setText(EmoticonUtils.getSmiledText(context, messageSubString,
+                            emojiconHandler));
                 }
-
                 if (myholder.sentOrReceived != null) {
                     if (message.isCall()) {
                         myholder.sentOrReceived.setImageResource(R.drawable.applozic_ic_action_call_holo_light);
@@ -404,8 +424,85 @@ public class QuickConversationAdapter extends RecyclerView.Adapter implements Fi
         }
     }
 
+    public void setUpAttachmentMessage(String message, String mimType, TextView messageTextView, ImageView attachmentIcon) {
+        if (!TextUtils.isEmpty(mimType)) {
+            if (mimType.startsWith("image")) {
+                attachmentIcon.setVisibility(View.VISIBLE);
+                attachmentIcon.setImageResource(R.drawable.applozic_ic_action_camera);
+                if (TextUtils.isEmpty(message)) {
+                    messageTextView.setText("Photo");
+                } else {
+                    messageTextView.setText(message);
+                }
+            } else if (mimType.startsWith("video")) {
+                attachmentIcon.setVisibility(View.VISIBLE);
+                attachmentIcon.setImageResource(R.drawable.applozic_ic_action_video);
+                if (TextUtils.isEmpty(message)) {
+                    messageTextView.setText("Video");
+                } else {
+                    messageTextView.setText(message);
+                }
+            } else if (mimType.startsWith("audio")) {
+                attachmentIcon.setVisibility(View.VISIBLE);
+                attachmentIcon.setImageResource(R.drawable.applozic_ic_action_audio);
+                if (TextUtils.isEmpty(message)) {
+                    messageTextView.setText("Audio");
+                } else {
+                    messageTextView.setText(message);
+                }
+            } else if (mimType.contains("text/x-vcard")) {
+                attachmentIcon.setVisibility(View.VISIBLE);
+                attachmentIcon.setImageResource(R.drawable.applozic_ic_action_contact);
+                messageTextView.setText("Contact");
+            } /*else if (mimType.contains("location")){
+                attachmentIcon.setVisibility(View.VISIBLE);
+                attachmentIcon.setImageResource(R.drawable.mobicom_notification_location_icon);
+                messageTextView.setText(context.getString(R.string.Location));
+
+            }*/ else {
+                attachmentIcon.setVisibility(View.VISIBLE);
+                attachmentIcon.setImageResource(R.drawable.applozic_ic_action_attachment);
+                messageTextView.setText("Attachment");
+            }
+        }
+    }
+
     public class Myholder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnCreateContextMenuListener {
 
+        final ImageView attachmentIcon;
+        private final MenuItem.OnMenuItemClickListener onEditMenu = new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Message message = messageList.get(getLayoutPosition());
+
+                Channel channel = null;
+                Contact contact = null;
+                if (message.getGroupId() != null) {
+                    channel = ChannelDatabaseService.getInstance(context).getChannelByChannelKey(message.getGroupId());
+                } else {
+                    contact = contactService.getContactById(message.getContactIds());
+                }
+
+                switch (item.getItemId()) {
+                    case 0:
+                        if (channel != null && channel.isDeleted()) {
+                            conversationUIService.deleteGroupConversation(channel);
+                        } else {
+                            conversationUIService.deleteConversationThread(contact, channel);
+                        }
+                        break;
+                    case 1:
+                        conversationUIService.deleteGroupConversation(channel);
+                        break;
+                    case 2:
+                        conversationUIService.channelLeaveProcess(channel);
+                        break;
+                    default:
+                        //return onMenuItemClick(item);
+                }
+                return true;
+            }
+        };
         TextView smReceivers;
         TextView createdAtTime;
         TextView messageTextView;
@@ -414,7 +511,6 @@ public class QuickConversationAdapter extends RecyclerView.Adapter implements Fi
         TextView onlineTextView;
         ImageView sentOrReceived;
         TextView attachedFile;
-        final ImageView attachmentIcon;
         TextView unReadCountTextView;
         TextView smTime;
 
@@ -478,20 +574,17 @@ public class QuickConversationAdapter extends RecyclerView.Adapter implements Fi
 
                 if ((message.getGroupId() == null ||
                         (channel != null &&
-                        Channel.GroupType.GROUPOFTWO.getValue().equals(channel.getType())))
-                        && (menuItems[i].equals(context.getResources().getString(R.string.delete_group))
-                        || menuItems[i].equals(context.getResources().getString(R.string.exit_group)))) {
+                                Channel.GroupType.GROUPOFTWO.getValue().equals(channel.getType()))) &&
+                        (menuItems[i].equals(context.getResources().getString(R.string.delete_group)) ||
+                                menuItems[i].equals(context.getResources().getString(R.string.exit_group)))) {
                     continue;
                 }
 
-                if (menuItems[i].equals(context.getResources().getString(R.string.exit_group)) && (isChannelDeleted ||
-                        !isUserPresentInGroup)) {
+                if (menuItems[i].equals(context.getResources().getString(R.string.exit_group)) && (isChannelDeleted || !isUserPresentInGroup)) {
                     continue;
                 }
 
-                if (menuItems[i].equals(context.getResources().getString(R.string.delete_group)) &&
-                        (isUserPresentInGroup || !isChannelDeleted)) {
-
+                if (menuItems[i].equals(context.getResources().getString(R.string.delete_group)) && (isUserPresentInGroup || !isChannelDeleted)) {
                     continue;
                 }
                 if (menuItems[i].equals(context.getResources().getString(R.string.delete_conversation)) && !alCustomizationSettings.isDeleteOption()) {
@@ -502,40 +595,6 @@ public class QuickConversationAdapter extends RecyclerView.Adapter implements Fi
                 item.setOnMenuItemClickListener(onEditMenu);
             }
         }
-
-        private final MenuItem.OnMenuItemClickListener onEditMenu = new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                Message message = messageList.get(getLayoutPosition());
-
-                Channel channel = null;
-                Contact contact = null;
-                if (message.getGroupId() != null) {
-                    channel = ChannelDatabaseService.getInstance(context).getChannelByChannelKey(message.getGroupId());
-                } else {
-                    contact = contactService.getContactById(message.getContactIds());
-                }
-
-                switch (item.getItemId()) {
-                    case 0:
-                        if (channel != null && channel.isDeleted()) {
-                            conversationUIService.deleteGroupConversation(channel);
-                        } else {
-                            conversationUIService.deleteConversationThread(contact, channel);
-                        }
-                        break;
-                    case 1:
-                        conversationUIService.deleteGroupConversation(channel);
-                        break;
-                    case 2:
-                        conversationUIService.channelLeaveProcess(channel);
-                        break;
-                    default:
-                        //return onMenuItemClick(item);
-                }
-                return true;
-            }
-        };
 
     }
 
@@ -548,6 +607,7 @@ public class QuickConversationAdapter extends RecyclerView.Adapter implements Fi
             infoBroadCast = (TextView) itemView.findViewById(R.id.info_broadcast);
             loadMoreProgressBar = (ProgressBar) itemView.findViewById(R.id.load_more_progressbar);
         }
+
     }
 
 }

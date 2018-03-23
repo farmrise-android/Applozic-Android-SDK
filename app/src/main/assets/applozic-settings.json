@@ -46,7 +46,7 @@
   "startNewGroup": true,
   "imageCompression": true,
   "inviteFriendsInContactActivity": true,
-  "registeredUserContactListCall": false,
+  "registeredUserContactListCall": true,
   "createAnyContact": false,
   "showActionDialWithOutCalling": false,
   "profileLogoutButton": false,
