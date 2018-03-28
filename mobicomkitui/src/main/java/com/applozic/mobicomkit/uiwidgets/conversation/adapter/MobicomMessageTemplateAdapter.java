@@ -3,7 +3,6 @@ package com.applozic.mobicomkit.uiwidgets.conversation.adapter;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -11,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.applozic.mobicomkit.ApplozicClient;
 import com.applozic.mobicomkit.uiwidgets.R;
 import com.applozic.mobicomkit.uiwidgets.conversation.MobicomMessageTemplate;
 
@@ -28,23 +28,31 @@ public class MobicomMessageTemplateAdapter extends RecyclerView.Adapter<MobicomM
     private MessageTemplateDataListener listener;
     private List<String> messageList;
     private Map<String, String> messageMap;
+    private Context context;
 
-    public MobicomMessageTemplateAdapter(MobicomMessageTemplate messageTemplate) {
+    public MobicomMessageTemplateAdapter(Context context, MobicomMessageTemplate messageTemplate) {
         this.messageTemplate = messageTemplate;
-        this.messageList = new ArrayList<>(messageTemplate.getMessages().keySet());
-        this.messageMap = messageTemplate.getMessages();
+        messageMap = messageTemplate.getMessages();
+        Map<String, String> tempMap = ApplozicClient.getInstance(context).getMessageTemplates();
+
+        if (tempMap != null && !tempMap.isEmpty()) {
+            messageMap.putAll(tempMap);
+        }
+
+        messageList = new ArrayList<>(messageMap.keySet());
+
+        this.context = context;
     }
 
-    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.mobicom_message_template_item, parent, false);
         return new ViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         holder.messageText.setText(messageList.get(position));
         holder.messageText.setTextColor(Color.parseColor(messageTemplate.getTextColor()));
         holder.messageText.setBackgroundDrawable(getShape(holder.messageText.getContext()));
@@ -63,8 +71,14 @@ public class MobicomMessageTemplateAdapter extends RecyclerView.Adapter<MobicomM
     }
 
     public void setMessageList(Map<String, String> messageList) {
-        this.messageMap = messageList;
-        this.messageList = new ArrayList<>(messageList.keySet());
+        Map<String, String> tempMap = ApplozicClient.getInstance(context).getMessageTemplates();
+        messageMap = messageList;
+
+        if (tempMap != null && !tempMap.isEmpty()) {
+            messageMap.putAll(tempMap);
+        }
+
+        this.messageList = new ArrayList<>(messageMap.keySet());
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -96,5 +110,10 @@ public class MobicomMessageTemplateAdapter extends RecyclerView.Adapter<MobicomM
 
     public interface MessageTemplateDataListener {
         void onItemSelected(String messsage);
+    }
+
+    public void removeTemplates() {
+        messageList.clear();
+        notifyDataSetChanged();
     }
 }

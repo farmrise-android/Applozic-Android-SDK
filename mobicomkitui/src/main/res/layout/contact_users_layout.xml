@@ -2,7 +2,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="8dp">
 
@@ -15,7 +14,7 @@
         android:layout_marginTop="6dp"
         android:layout_marginStart="6dp">
 
-        <TextView
+        <com.applozic.mobicomkit.uiwidgets.CustomTextViewRegular
             android:id="@+id/alphabeticImage"
             android:layout_width="50dp"
             android:layout_height="50dp"
@@ -39,7 +38,7 @@
 
     </RelativeLayout>
 
-    <TextView
+    <com.applozic.mobicomkit.uiwidgets.CustomTextViewRegular
         android:id="@+id/lastSeenAtTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -50,7 +49,7 @@
         android:paddingLeft="@dimen/listview_item_padding"
         android:paddingStart="@dimen/listview_item_padding"
         android:textDirection="locale"
-        android:textAlignment="gravity" android:text="Just now"
+        android:textAlignment="gravity"
         android:paddingRight="@dimen/listview_item_padding"
         android:paddingEnd="@dimen/listview_item_padding"
         android:singleLine="true"
@@ -63,7 +62,8 @@
          consistency. This view also sets layout_alignWithParentIfMissing=true which lets the view
          align with the parent view if the text2 view is not part of the view hierarchy (which is
          its initial state). -->
-    <TextView
+
+    <com.applozic.mobicomkit.uiwidgets.CustomTextViewRegular
         android:id="@+id/displayName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -82,13 +82,13 @@
         android:paddingEnd="@dimen/listview_item_padding"
         android:maxLines="1"
         android:textColor="#FF333333"
-        android:textSize="15sp" android:text="Sai Android"
+        android:textSize="15sp"
         android:layout_alignParentEnd="true"
         android:layout_toEndOf="@id/profile_image_relative_layout" />
 
 
     <!--Originally, @string/admin_text at android:text="Group Admin"-->
-    <TextView
+    <com.applozic.mobicomkit.uiwidgets.CustomTextViewRegular
         android:id="@+id/adminTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -107,7 +107,6 @@
         android:text="@string/admin_text"
         android:textSize="12sp"
         android:visibility="gone"
-        android:layout_alignParentEnd="true"
-        />
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>

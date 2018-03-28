@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Process;
 import android.text.TextUtils;
 
+import com.applozic.mobicomkit.ApplozicClient;
 import com.applozic.mobicomkit.api.account.user.MobiComUserPreference;
 import com.applozic.mobicomkit.api.conversation.Message;
 import com.applozic.mobicomkit.api.conversation.SyncCallService;
@@ -310,6 +311,10 @@ public class ApplozicMqttService extends MobiComKitClientService implements Mqtt
                             if (NOTIFICATION_TYPE.USER_DETAIL_CHANGED.getValue().equals(mqttMessageResponse.getType()) || NOTIFICATION_TYPE.USER_DELETE_NOTIFICATION.getValue().equals(mqttMessageResponse.getType())) {
                                 String userId = mqttMessageResponse.getMessage().toString();
                                 syncCallService.syncUserDetail(userId);
+                            }
+
+                            if (ApplozicClient.getInstance(context).isDeviceContactSync() && NOTIFICATION_TYPE.CONTACT_SYNC.getValue().equals(mqttMessageResponse.getType())) {
+                                syncCallService.processContactSync(mqttMessageResponse.getMessage().toString());
                             }
 
                             if (NOTIFICATION_TYPE.MESSAGE_METADATA_UPDATE.getValue().equals(mqttMessageResponse.getType())) {

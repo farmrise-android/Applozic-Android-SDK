@@ -21,6 +21,9 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="com.mobicomkit.sample.permission.MAPS_RECEIVE" />
 
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+
+
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 

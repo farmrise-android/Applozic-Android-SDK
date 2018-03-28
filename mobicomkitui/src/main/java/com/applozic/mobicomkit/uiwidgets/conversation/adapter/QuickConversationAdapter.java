@@ -96,6 +96,10 @@ public class QuickConversationAdapter extends RecyclerView.Adapter implements Fi
     private View view;
     private ConversationUIService conversationUIService;
 
+    public void setAlCustomizationSettings(AlCustomizationSettings alCustomizationSettings) {
+        this.alCustomizationSettings = alCustomizationSettings;
+    }
+
     public QuickConversationAdapter(final Context context, List<Message> messageList, EmojiconHandler emojiconHandler) {
         this.context = context;
         this.emojiconHandler = emojiconHandler;
@@ -124,9 +128,10 @@ public class QuickConversationAdapter extends RecyclerView.Adapter implements Fi
         highlightTextSpan = new TextAppearanceSpan(context, R.style.searchTextHiglight);
     }
 
-    public void setAlCustomizationSettings(AlCustomizationSettings alCustomizationSettings) {
+
+   /* public void setAlCustomizationSettings(AlCustomizationSettings alCustomizationSettings) {
         this.alCustomizationSettings = alCustomizationSettings;
-    }
+    }*/
 
     @NonNull
     @Override
@@ -183,22 +188,38 @@ public class QuickConversationAdapter extends RecyclerView.Adapter implements Fi
                 } else if (message.getGroupId() != null) {
                     if (channel != null && Channel.GroupType.GROUPOFTWO.getValue().equals(channel.getType())) {
                         contactImageLoader.setLoadingImage(R.drawable.applozic_ic_contact_picture_holo_light);
-                        Contact withUserContact = contactService.getContactById(ChannelService.getInstance(context).getGroupOfTwoReceiverUserId(channel.getKey()));
-                        if (withUserContact != null) {
-                            myholder.smReceivers.setText(withUserContact.getDisplayName());
-                            processContactImage(withUserContact, myholder.onlineTextView, myholder.alphabeticTextView, myholder.contactImage);
+
+                        if (Channel.GroupType.GROUPOFTWO.getValue().equals(channel.getType())) {
+
+                            Contact withUserContact = contactService.getContactById(ChannelService.getInstance(context).getGroupOfTwoReceiverUserId(channel.getKey()));
+                            if (withUserContact != null) {
+                                myholder.smReceivers.setText(withUserContact.getDisplayName());
+                                processContactImage(withUserContact, myholder.onlineTextView, myholder.alphabeticTextView, myholder.contactImage);
+                            }
                         }
                     } else {
-                        channelImageLoader.setLoadingImage(R.drawable.applozic_group_icon);
+                        //channelImageLoader.setLoadingImage(R.drawable.applozic_group_icon);
+
+                        if (channel != null && Channel.GroupType.SUPPORT_GROUP.getValue().
+                                equals(channel.getType())) {
+                            channelImageLoader.setLoadingImage(R.drawable.applozic_ic_contact_picture_holo_light);
+                            myholder.contactImage.setImageResource(R.drawable.applozic_ic_contact_picture_holo_light);
+                        } else {
+                            channelImageLoader.setLoadingImage(R.drawable.applozic_group_icon);
+                            myholder.contactImage.setImageResource(R.drawable.applozic_group_icon);
+                        }
+
                         myholder.smReceivers.setText(ChannelUtils.getChannelTitleName(channel, MobiComUserPreference.getInstance(context).getUserId()));
                         myholder.alphabeticTextView.setVisibility(View.GONE);
-                        myholder.contactImage.setImageResource(R.drawable.applozic_group_icon);
+                        //myholder.contactImage.setImageResource(R.drawable.applozic_group_icon);
                         myholder.contactImage.setVisibility(View.VISIBLE);
 
                         if (channel != null && !TextUtils.isEmpty(channel.getImageUrl())) {
                             channelImageLoader.loadImage(channel, myholder.contactImage);
                         } else if (channel != null && channel.isBroadcastMessage()) {
                             myholder.contactImage.setImageResource(R.drawable.applozic_ic_applozic_broadcast);
+                        } else if (channel != null && Channel.GroupType.SUPPORT_GROUP.getValue().equals(channel.getType())) {
+                            channelImageLoader.setLoadingImage(R.drawable.applozic_ic_contact_picture_holo_light);
                         } else {
                             channelImageLoader.setLoadingImage(R.drawable.applozic_group_icon);
                         }
@@ -503,6 +524,7 @@ public class QuickConversationAdapter extends RecyclerView.Adapter implements Fi
                 return true;
             }
         };
+
         TextView smReceivers;
         TextView createdAtTime;
         TextView messageTextView;
@@ -572,11 +594,17 @@ public class QuickConversationAdapter extends RecyclerView.Adapter implements Fi
 
             for (int i = 0; i < menuItems.length; i++) {
 
-                if ((message.getGroupId() == null ||
-                        (channel != null &&
-                                Channel.GroupType.GROUPOFTWO.getValue().equals(channel.getType()))) &&
-                        (menuItems[i].equals(context.getResources().getString(R.string.delete_group)) ||
-                                menuItems[i].equals(context.getResources().getString(R.string.exit_group)))) {
+              /*  if ((message.getGroupId() == null || (channel != null && Channel.GroupType.GROUPOFTWO.getValue().
+                        equals(channel.getType())))
+                        && (menuItems[i].equals(context.getResources().getString(R.string.delete_group)) ||
+                        menuItems[i].equals(context.getResources().getString(R.string.exit_group)))) {
+                    continue;
+                }
+*/
+                if ((message.getGroupId() == null || (channel != null && (Channel.GroupType.GROUPOFTWO.getValue().
+                        equals(channel.getType()) || Channel.GroupType.SUPPORT_GROUP.getValue().equals(channel.getType()))))
+                        && (menuItems[i].equals(context.getResources().getString(R.string.delete_group)) ||
+                        menuItems[i].equals(context.getResources().getString(R.string.exit_group)))) {
                     continue;
                 }
 

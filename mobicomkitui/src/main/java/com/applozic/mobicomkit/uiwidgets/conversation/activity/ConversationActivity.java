@@ -654,7 +654,8 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
     }
 
     public void processingLocation() {
-        if (alCustomizationSettings.isLocationShareViaMap() && !TextUtils.isEmpty(geoApiKey) && !API_KYE_STRING.equals(geoApiKey)) {
+        if (alCustomizationSettings.isLocationShareViaMap() && !TextUtils.isEmpty(geoApiKey)
+                && !API_KYE_STRING.equals(geoApiKey)) {
             Intent toMapActivity = new Intent(this, MobicomLocationActivity.class);
             startActivityForResult(toMapActivity, MultimediaOptionFragment.REQUEST_CODE_SEND_LOCATION);
         } else {

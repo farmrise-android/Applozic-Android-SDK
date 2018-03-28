@@ -5,10 +5,10 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
 import com.applozic.mobicommons.json.JsonMarker;
+import com.applozic.mobicommons.people.ALContactProcessor;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -58,12 +58,15 @@ public class Contact extends JsonMarker {
     private boolean blockedBy;
     private String status;
     private short contactType;
+    private Short deviceContactType;
     private Short userTypeId;
     private Long deletedAtTime;
     private Long notificationAfterTime;
     private Long lastMessageAtTime;
     private Map<String, String> metadata;
     private Short roleType;
+    private String phoneDisplayName;
+    private boolean applozicType = true;
 
     public Contact() {
 
@@ -95,6 +98,15 @@ public class Contact extends JsonMarker {
         this.processContactNumbers(context);
     }
 
+    public Short getDeviceContactType() {
+        return deviceContactType;
+    }
+
+    public void setDeviceContactType(Short contactType) {
+        this.deviceContactType = contactType;
+        setApplozicType(ContactType.APPLOZIC.getValue().equals(this.deviceContactType) || ContactType.DEVICE_AND_APPLOZIC.getValue().equals(this.deviceContactType));
+    }
+
     public short getContactType() {
         return contactType;
     }
@@ -108,7 +120,37 @@ public class Contact extends JsonMarker {
         String countryCode = telephonyManager.getSimCountryIso().toUpperCase();
         if (TextUtils.isEmpty(getFormattedContactNumber())) {
             //setFormattedContactNumber(ContactNumberUtils.getPhoneNumber(getContactNumber(), countryCode));
+
+            if (((ALContactProcessor) context.getApplicationContext()) != null) {
+                setFormattedContactNumber(((ALContactProcessor) context.getApplicationContext()).processContact(getContactNumber(), countryCode));
+            }
         }
+    }
+
+    public boolean isApplozicType() {
+        return applozicType;
+    }
+
+    public void setApplozicType(boolean applozicType) {
+        this.applozicType = applozicType;
+    }
+
+
+    public String getPhoneDisplayName() {
+        return phoneDisplayName;
+    }
+
+
+    public void setPhoneDisplayName(String phoneDisplayName) {
+        this.phoneDisplayName = phoneDisplayName;
+    }
+
+    public boolean isDeviceContact() {
+        return (deviceContactType != null && ContactType.DEVICE.getValue().equals(deviceContactType));
+    }
+
+    public String getContactNumber() {
+        return contactNumber;
     }
 
 /*  Todo: Will be used for device contacts
@@ -160,10 +202,6 @@ public class Contact extends JsonMarker {
 
         setFormattedContactNumber(ContactNumberUtils.getPhoneNumber(getContactNumber(), countryCode));
     }*/
-
-    public String getContactNumber() {
-        return contactNumber;
-    }
 
     public void setContactNumber(String contactNumber) {
         this.contactNumber = contactNumber;
@@ -226,10 +264,18 @@ public class Contact extends JsonMarker {
     }
 
     public String getDisplayName() {
+
+        if (deviceContactType != null && (ContactType.DEVICE.getValue().equals(deviceContactType) || ContactType.DEVICE_AND_APPLOZIC.getValue().equals(deviceContactType))) {
+            return TextUtils.isEmpty(phoneDisplayName) ? TextUtils.isEmpty(getFormattedContactNumber()) ? getContactIds() : getFormattedContactNumber() : phoneDisplayName;
+        }
+
         return TextUtils.isEmpty(fullName) ? getContactIds() : fullName;
     }
 
     public String getFullName() {
+        if (deviceContactType != null && (ContactType.DEVICE.getValue().equals(deviceContactType) || ContactType.DEVICE_AND_APPLOZIC.getValue().equals(deviceContactType))) {
+            return TextUtils.isEmpty(phoneDisplayName) ? fullName : phoneDisplayName;
+        }
         return fullName == null ? "" : fullName;
     }
 
@@ -350,7 +396,6 @@ public class Contact extends JsonMarker {
         this.userTypeId = userTypeId;
     }
 
-
     public String getUserId() {
         return userId;
     }
@@ -440,12 +485,12 @@ public class Contact extends JsonMarker {
         this.metadata = metadata;
     }
 
-    public void setRoleType(Short roleType) {
-        this.roleType = roleType;
-    }
-
     public Short getRoleType() {
         return roleType;
+    }
+
+    public void setRoleType(Short roleType) {
+        this.roleType = roleType;
     }
 
     @Override
@@ -474,11 +519,33 @@ public class Contact extends JsonMarker {
                 ", blockedBy=" + blockedBy +
                 ", status='" + status + '\'' +
                 ", contactType=" + contactType + '\'' +
+                ", deviceContactType=" + deviceContactType +
                 ", userTypeId=" + userTypeId + '\'' +
-                ", deletedAtTime=" + deletedAtTime + '\''+
+                ", deletedAtTime=" + deletedAtTime + '\'' +
+                ", notificationAfterTime=" + notificationAfterTime +
+                ", lastMessageAtTime=" + lastMessageAtTime +
+                ", metadata=" + metadata +
                 ", roleType=" + roleType +
-                ", lastMessagedAt=" + lastMessageAtTime +
-                ", metadata='" + metadata + '\''+
+                ", phoneDisplayName='" + phoneDisplayName + '\'' +
+                ", applozicType=" + applozicType +
+             /*   ", lastMessagedAt=" + lastMessageAtTime +
+                ", metadata='" + metadata + '\'' +*/
                 '}';
     }
+
+    public enum ContactType {
+        APPLOZIC(Short.valueOf("0")), DEVICE(Short.valueOf("1")), DEVICE_AND_APPLOZIC(Short.valueOf("2"));
+
+        private Short value;
+
+        ContactType(Short value) {
+            this.value = value;
+        }
+
+        public Short getValue() {
+            return value;
+        }
+    }
+
+
 }

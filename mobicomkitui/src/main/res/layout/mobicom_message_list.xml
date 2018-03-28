@@ -84,7 +84,7 @@
 
         </android.support.v4.widget.SwipeRefreshLayout>
 
-        <TextView
+        <com.applozic.mobicomkit.uiwidgets.CustomTextViewRegular
         android:id="@+id/noConversations"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -183,7 +183,8 @@
 
     </RelativeLayout>
 
-    <TextView
+    <com.applozic.mobicomkit.uiwidgets.CustomTextViewRegular
+
         android:id="@+id/emptyConversation"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -212,7 +213,7 @@
             android:layout_height="fill_parent"
             android:adjustViewBounds="true" />
 
-        <TextView
+        <com.applozic.mobicomkit.uiwidgets.CustomTextViewRegular
             android:id="@+id/attached_file"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
@@ -316,7 +317,7 @@
         android:orientation="horizontal"
         android:visibility="gone">
 
-        <TextView
+        <com.applozic.mobicomkit.uiwidgets.CustomTextViewRegular
             android:id="@+id/isTyping"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -500,7 +501,7 @@
                         android:layout_marginTop="1dp"
                         android:src="@drawable/applozic_audio_record" />
 
-                    <TextView
+                    <com.applozic.mobicomkit.uiwidgets.CustomTextViewRegular
                         android:id="@+id/recording_time_text_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -572,7 +573,7 @@
         android:orientation="horizontal"
         android:visibility="gone">
 
-        <TextView
+        <com.applozic.mobicomkit.uiwidgets.CustomTextViewRegular
             android:id="@+id/user_not_able_to_chat_textView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

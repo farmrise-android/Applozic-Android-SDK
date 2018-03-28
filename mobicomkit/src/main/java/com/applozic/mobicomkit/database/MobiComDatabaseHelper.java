@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.applozic.mobicomkit.ApplozicClient;
 import com.applozic.mobicomkit.api.MobiComKitClientService;
 import com.applozic.mobicomkit.api.account.user.MobiComUserPreference;
 import com.applozic.mobicomkit.api.account.user.UserClientService;
@@ -12,7 +13,7 @@ import com.applozic.mobicommons.commons.core.utils.Utils;
 
 public class MobiComDatabaseHelper extends SQLiteOpenHelper {
 
-    public static final int DB_VERSION = 30;
+    public static final int DB_VERSION = 31;
 
     public static final String _ID = "_id";
     public static final String DB_NAME = "APPLOZIC_LOCAL_DATABASE";
@@ -73,6 +74,9 @@ public class MobiComDatabaseHelper extends SQLiteOpenHelper {
     public static final String LAST_MESSAGED_AT = "lastMessagedAt";
     public static final String URL = "url";
     public static final String ROLE = "role";
+    public static final String APPLOZIC_TYPE = "applozicType";
+    public static final String PHONE_CONTACT_DISPLAY_NAME = "phoneContactDisplayName";
+    public static final String DEVICE_CONTACT_TYPE = "deviceContactType";
 
 
     public static final String CREATE_SCHEDULE_SMS_TABLE = "create table " + SCHEDULE_SMS_TABLE_NAME + "( "
@@ -154,6 +158,10 @@ public class MobiComDatabaseHelper extends SQLiteOpenHelper {
     private static final String ALTER_CONTACT_TABLE_FOR_LAST_MESSAGED_AT = "ALTER TABLE " + CONTACT_TABLE_NAME + " ADD COLUMN " + LAST_MESSAGED_AT + " integer default 0";
     private static final String ALTER_SMS_TABLE_FOR_FILE_URL = "ALTER TABLE " + SMS + " ADD COLUMN url varchar(2000)";
     private static final String ALTER_CHANNEL_USER_MAPPER_TABLE_FOR_ROLE = "ALTER TABLE " + CHANNEL_USER_X + " ADD COLUMN " + ROLE + " integer default 0";
+    private static final String ALTER_CONTACT_TABLE_FOR_PHONE_CONTACT_DISPLAY_NAME = "ALTER TABLE " + CONTACT_TABLE_NAME + " ADD COLUMN " + PHONE_CONTACT_DISPLAY_NAME + " varchar(100) ";
+    private static final String ALTER_CONTACT_TABLE_FOR_APPLOZIC_TYPE = "ALTER TABLE " + CONTACT_TABLE_NAME + " ADD COLUMN " + APPLOZIC_TYPE + " integer default 1";
+    private static final String ALTER_CONTACT_TABLE_FOR_DEVICE_CONTACT_TYPE = "ALTER TABLE " + CONTACT_TABLE_NAME + " ADD COLUMN " + DEVICE_CONTACT_TYPE + " integer default 1";
+
     private static final String CREATE_CONTACT_TABLE = " CREATE TABLE contact ( " +
             USERID + " VARCHAR(50) primary key, "
             + FULL_NAME + " VARCHAR(200), "
@@ -169,13 +177,16 @@ public class MobiComDatabaseHelper extends SQLiteOpenHelper {
             + BLOCKED + " integer default 0, "
             + BLOCKED_BY + " integer default 0, "
             + STATUS + " varchar(2500) null, "
+            + PHONE_CONTACT_DISPLAY_NAME + " varchar(100),"
             + CONTACT_TYPE + " integer default 0,"
+            + APPLOZIC_TYPE + " integer default 0, "
             + USER_TYPE_ID + " integer default 0,"
             + DELETED_AT + " INTEGER default 0, "
             + NOTIFICATION_AFTER_TIME + " integer default 0, "
             + USER_ROLE_TYPE + " integer default 0, "
             + LAST_MESSAGED_AT + " integer, "
-            + USER_METADATA + " varchar(2000) null"
+            + USER_METADATA + " varchar(2000) null, "
+            + DEVICE_CONTACT_TYPE + " integer default 1"
             + " ) ";
 
     private static final String CREATE_CHANNEL_TABLE = " CREATE TABLE channel ( " +
@@ -385,6 +396,15 @@ public class MobiComDatabaseHelper extends SQLiteOpenHelper {
             if (!DBUtils.existsColumnInTable(database, "CHANNEL_USER_X", ROLE)) {
                 database.execSQL(ALTER_CHANNEL_USER_MAPPER_TABLE_FOR_ROLE);
             }
+            if (!DBUtils.existsColumnInTable(database, "contact", APPLOZIC_TYPE)) {
+                database.execSQL(ALTER_CONTACT_TABLE_FOR_APPLOZIC_TYPE);
+            }
+            if (!DBUtils.existsColumnInTable(database, "contact", PHONE_CONTACT_DISPLAY_NAME)) {
+                database.execSQL(ALTER_CONTACT_TABLE_FOR_PHONE_CONTACT_DISPLAY_NAME);
+            }
+            if (!DBUtils.existsColumnInTable(database, CONTACT_TABLE_NAME, DEVICE_CONTACT_TYPE)) {
+                database.execSQL(ALTER_CONTACT_TABLE_FOR_DEVICE_CONTACT_TYPE);
+            }
             database.execSQL(CREATE_INDEX_ON_CREATED_AT);
             database.execSQL(CREATE_INDEX_SMS_TYPE);
             database.execSQL(ALTER_SMS_TABLE);
@@ -421,7 +441,7 @@ public class MobiComDatabaseHelper extends SQLiteOpenHelper {
 
         db.execSQL("delete from " + SMS_TABLE_NAME);
 
-        db.execSQL("delete from " + CONTACT_TABLE_NAME);
+        db.execSQL("delete from " + CONTACT_TABLE_NAME + (ApplozicClient.getInstance(context).isDeviceContactSync() ? " where " + DEVICE_CONTACT_TYPE + " = 0" : ""));
 
         db.execSQL("delete from " + CHANNEL);
 

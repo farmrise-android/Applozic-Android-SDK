@@ -215,6 +215,7 @@ public class Channel extends JsonMarker {
         OPEN(6),
         GROUPOFTWO(7),
         CONTACT_GROUP(9),
+        SUPPORT_GROUP(10),
         BROADCAST_ONE_BY_ONE(106);
 
         private Integer value;

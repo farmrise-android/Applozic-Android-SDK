@@ -13,6 +13,7 @@ import com.applozic.mobicomkit.contact.AppContactService;
 import com.applozic.mobicomkit.contact.BaseContactService;
 import com.applozic.mobicomkit.contact.database.ContactDatabase;
 import com.applozic.mobicommons.commons.core.utils.Utils;
+import com.applozic.mobicommons.people.contact.Contact;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -178,6 +179,25 @@ public class SyncCallService {
 
     public void syncUserDetail(String userId) {
         messageClientService.processUserStatus(userId, true);
+    }
+
+    public void processContactSync(final String userId) {
+        Utils.printLog(context,TAG, "process contact sync for userId: " + userId);
+        if (!TextUtils.isEmpty(userId) && contactService.isContactPresent(userId)) {
+            Contact contact = contactService.getContactById(userId);
+
+
+            if (contact.isApplozicType()) {
+                Utils.printLog(context,TAG, "Contact is already present, MQTT reached before GCM.");
+                return;
+            }
+        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                UserService.getInstance(context).processContactSync();
+            }
+        }).start();
     }
 
 }

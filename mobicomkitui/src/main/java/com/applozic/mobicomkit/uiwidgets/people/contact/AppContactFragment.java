@@ -2,10 +2,12 @@ package com.applozic.mobicomkit.uiwidgets.people.contact;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
@@ -35,16 +37,20 @@ import android.widget.SectionIndexer;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.applozic.mobicomkit.ApplozicClient;
 import com.applozic.mobicomkit.api.account.user.MobiComUserPreference;
 import com.applozic.mobicomkit.api.account.user.RegisteredUsersAsyncTask;
+import com.applozic.mobicomkit.api.account.user.UserBlockTask;
 import com.applozic.mobicomkit.broadcast.BroadcastService;
 import com.applozic.mobicomkit.channel.database.ChannelDatabaseService;
 import com.applozic.mobicomkit.contact.AppContactService;
 import com.applozic.mobicomkit.contact.BaseContactService;
 import com.applozic.mobicomkit.contact.database.ContactDatabase;
+import com.applozic.mobicomkit.feed.ApiResponse;
 import com.applozic.mobicomkit.feed.RegisteredUsersApiResponse;
 import com.applozic.mobicomkit.uiwidgets.AlCustomizationSettings;
 import com.applozic.mobicomkit.uiwidgets.ApplozicSetting;
+import com.applozic.mobicomkit.uiwidgets.CustomTextViewRegular;
 import com.applozic.mobicomkit.uiwidgets.R;
 import com.applozic.mobicomkit.uiwidgets.alphanumbericcolor.AlphaNumberColorUtil;
 import com.applozic.mobicomkit.uiwidgets.async.AlGetMembersFromContactGroupListTask;
@@ -58,6 +64,7 @@ import com.applozic.mobicommons.people.channel.Channel;
 import com.applozic.mobicommons.people.contact.Contact;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -81,6 +88,7 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
     // Bundle key for saving previously selected search result item
     private static final String STATE_PREVIOUSLY_SELECTED_KEY =
             "net.mobitexter.mobiframework.contact.ui.SELECTED_ITEM";
+    static int CONSTANT_TIME = 60 * 1000;
     private static String inviteMessage;
     AlCustomizationSettings alCustomizationSettings;
     RefreshContactsScreenBroadcast refreshContactsScreenBroadcast;
@@ -100,6 +108,7 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
     private String[] userIdArray;
     private MobiComUserPreference userPreference;
     private ContactDatabase contactDatabase;
+    private boolean isDeviceContactSync;
 
     /**
      * Fragments require an empty constructor.
@@ -125,6 +134,7 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
         mAdapter = new ContactsAdapter(getActivity().getApplicationContext());
         userPreference = MobiComUserPreference.getInstance(getContext());
         inviteMessage = Utils.getMetaDataValue(getActivity().getApplicationContext(), SHARE_TEXT);
+        isDeviceContactSync = ApplozicClient.getInstance(getContext()).isDeviceContactSync();
         if (savedInstanceState != null) {
             mSearchTerm = savedInstanceState.getString(SearchManager.QUERY);
             mPreviouslySelectedSearchItem =
@@ -233,7 +243,6 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-
         /*shareButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent();
@@ -262,6 +271,7 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
 
         setListAdapter(mAdapter);
         getListView().setOnItemClickListener(this);
+        getListView().setFastScrollEnabled(true);
         getListView().setOnScrollListener(new EndlessScrollListener());
 
         // If there's a previously selected search item from a saved state then don't bother
@@ -306,6 +316,19 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
         // Moves to the Cursor row corresponding to the ListView item that was clicked
         cursor.moveToPosition(position);
         Contact contact = contactDatabase.getContact(cursor, "_id");
+
+        if (contact.isBlocked()) {
+            userUnBlockDialog(contact);
+            return;
+        }
+
+        //TODO: place Invite code here.Invite view is invisible, make visibility here based on condition.
+        if (contact.isDeviceContact()) {
+            //Starting sms app for invite with number
+            //openInvite();
+            return;
+        }
+
         mOnContactSelectedListener.onCustomContactSelected(contact);
     }
 
@@ -380,8 +403,14 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-        Loader<Cursor> loader = contactDatabase.getSearchCursorLoader(mSearchTerm, userIdArray);
-        return loader;
+       /* Loader<Cursor> loader = contactDatabase.getSearchCursorLoader(mSearchTerm, userIdArray);
+        return loader;*/
+
+        if (isDeviceContactSync) {
+            return contactDatabase.getPhoneContactCursorLoader(mSearchTerm, userIdArray, true);
+        } else {
+            return contactDatabase.getSearchCursorLoader(mSearchTerm, userIdArray);
+        }
     }
 
     @Override
@@ -449,8 +478,27 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
     @Override
     public void onResume() {
         super.onResume();
-        if (refreshContactsScreenBroadcast != null) {
+       /* if (refreshContactsScreenBroadcast != null) {
             LocalBroadcastManager.getInstance(getActivity()).registerReceiver(refreshContactsScreenBroadcast, new IntentFilter(BroadcastService.INTENT_ACTIONS.UPDATE_USER_DETAIL.toString()));
+        }*/
+
+        try {
+            if (refreshContactsScreenBroadcast != null) {
+                LocalBroadcastManager.getInstance(getActivity()).registerReceiver(refreshContactsScreenBroadcast, new IntentFilter(BroadcastService.INTENT_ACTIONS.UPDATE_USER_DETAIL.toString()));
+            }
+
+            if (isDeviceContactSync) {
+                if (userPreference.getDeviceContactSyncTime() != 0) {
+                    Date date = new Date();
+                    if ((date.getTime() - userPreference.getDeviceContactSyncTime()) >= CONSTANT_TIME) {
+                        Intent intent = new Intent(getActivity(), DeviceContactSyncService.class);
+                        intent.putExtra(DeviceContactSyncService.PROCESS_USER_DETAILS, true);
+                        DeviceContactSyncService.enqueueWork(getContext(), intent);
+                    }
+                }
+            }
+        } catch (Exception e) {
+
         }
 
     }
@@ -461,6 +509,57 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
         if (refreshContactsScreenBroadcast != null) {
             LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(refreshContactsScreenBroadcast);
         }
+    }
+
+    public void blockUserProcess(final Contact contact, final boolean block) {
+        final ProgressDialog progressDialog = ProgressDialog.show(getActivity(), "",
+                getActivity().getString(R.string.please_wait_info), true);
+
+        UserBlockTask.TaskListener listener = new UserBlockTask.TaskListener() {
+
+            @Override
+            public void onSuccess(ApiResponse apiResponse) {
+                getLoaderManager().restartLoader(
+                        ContactsQuery.QUERY_ID, null, AppContactFragment.this);
+            }
+
+            @Override
+            public void onFailure(ApiResponse apiResponse, Exception exception) {
+                String error = getString(Utils.isInternetAvailable(getActivity()) ? R.string.applozic_server_error : R.string.you_need_network_access_for_block_or_unblock);
+                Toast toast = Toast.makeText(getActivity(), error, Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+            }
+
+            @Override
+            public void onCompletion() {
+                if (progressDialog != null && progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                }
+            }
+
+        };
+
+        new UserBlockTask(getActivity(), listener, contact.getUserId(), block).execute((Void) null);
+    }
+
+    public void userUnBlockDialog(final Contact contact) {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity()).
+                setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        blockUserProcess(contact, false);
+                    }
+                });
+        alertDialog.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+            }
+        });
+        String name = contact.getDisplayName();
+        alertDialog.setMessage(getString(R.string.user_un_block_info).replace("[name]", name));
+        alertDialog.setCancelable(true);
+        alertDialog.create().show();
     }
 
     /**
@@ -565,9 +664,11 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
          */
         private int indexOfSearchQuery(String displayName) {
             if (!TextUtils.isEmpty(mSearchTerm)) {
+
                 resultTextView.setVisibility(View.VISIBLE);
                 resultTextView.setText(R.string.no_contacts);
                 startInviteLayout.setVisibility(View.GONE);
+
                 return displayName.toLowerCase(Locale.getDefault()).indexOf(
                         mSearchTerm.toLowerCase(Locale.getDefault()));
             } else {
@@ -594,11 +695,13 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
                     mInflater.inflate(R.layout.contact_list_item, parent, false);
 
             final ViewHolder holder = new ViewHolder();
-            holder.text1 = (TextView) itemLayout.findViewById(R.id.text1);
-            holder.text2 = (TextView) itemLayout.findViewById(R.id.text2);
-            holder.contactNumberTextView = (TextView) itemLayout.findViewById(R.id.contactNumberTextView);
+            holder.text1 = (CustomTextViewRegular) itemLayout.findViewById(R.id.text1);
+            holder.text2 = (CustomTextViewRegular) itemLayout.findViewById(R.id.text2);
+            holder.contactNumberTextView = (CustomTextViewRegular) itemLayout.findViewById(R.id.contactNumberTextView);
             holder.icon = (CircleImageView) itemLayout.findViewById(R.id.contactImage);
             holder.contactIcon = (TextView) itemLayout.findViewById(R.id.contactIcon);
+            holder.invite = itemLayout.findViewById(R.id.invite);
+            holder.unBlock = itemLayout.findViewById(R.id.unblock);
             itemLayout.setTag(holder);
             return itemLayout;
         }
@@ -616,8 +719,25 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
             Contact contact = contactDatabase.getContact(cursor, "_id");
             ///////////////////
 
-            holder.text1.setText(contact.getDisplayName() == null ? contact.getUserId() : contact.getDisplayName());
+            holder.text1.setText(contact.getDisplayName());
+            //== null ? contact.getUserId() : contact.getDisplayName());
             holder.text2.setText(contact.getUserId());
+            holder.unBlock.setVisibility(View.GONE);
+            holder.invite.setVisibility(View.GONE);
+
+            if (isDeviceContactSync) {
+                if (contact.isDeviceContact()) {
+                    holder.invite.setVisibility(View.VISIBLE);
+                } else {
+                    holder.invite.setVisibility(View.GONE);
+                }
+
+                if (contact.isBlocked()) {
+                    holder.unBlock.setVisibility(View.VISIBLE);
+                } else {
+                    holder.unBlock.setVisibility(View.GONE);
+                }
+            }
             if (contact != null && !TextUtils.isEmpty(contact.getDisplayName())) {
                 contactNumber = contact.getDisplayName().toUpperCase();
                 firstLetter = contact.getDisplayName().toUpperCase().charAt(0);
@@ -640,12 +760,17 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
                     mImageLoader.loadImage(contact, holder.icon, holder.contactIcon);
                 }
             }
-            if (!TextUtils.isEmpty(contact.getContactNumber())) {
+            if (!TextUtils.isEmpty(contact.getContactNumber()) || isDeviceContactSync) {
                 layoutParams = (RelativeLayout.LayoutParams) holder.text1.getLayoutParams();
                 layoutParams.setMargins(0, 20, 0, 0);
                 holder.text1.setLayoutParams(layoutParams);
                 holder.contactNumberTextView.setVisibility(View.VISIBLE);
-                holder.contactNumberTextView.setText(contact.getContactNumber());
+                if (isDeviceContactSync) {
+                    holder.contactNumberTextView.setText(contact.getFormattedContactNumber());
+                } else {
+                    holder.contactNumberTextView.setText(contact.getContactNumber());
+                }
+                //holder.contactNumberTextView.setText(contact.getContactNumber());
 
             } else {
                 holder.text2.setVisibility(View.GONE);
@@ -753,11 +878,13 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
          * calling findViewById in each iteration of bindView.
          */
         private class ViewHolder {
-            TextView text1;
-            TextView text2;
+            CustomTextViewRegular text1;
+            CustomTextViewRegular text2;
             CircleImageView icon;
             TextView contactIcon;
-            TextView contactNumberTextView;
+            CustomTextViewRegular contactNumberTextView;
+            TextView invite;
+            TextView unBlock;
         }
     }
 
@@ -776,6 +903,5 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
             }
         }
     }
-
 }
 

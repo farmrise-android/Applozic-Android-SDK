@@ -1,13 +1,17 @@
 package com.applozic.mobicomkit.sample;
 
+import android.*;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -17,6 +21,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.applozic.mobicomkit.Applozic;
 import com.applozic.mobicomkit.ApplozicClient;
@@ -39,6 +44,7 @@ import com.applozic.mobicomkit.uiwidgets.conversation.activity.ConversationActiv
 import com.applozic.mobicomkit.uiwidgets.conversation.activity.MobiComKitActivityInterface;
 import com.applozic.mobicomkit.uiwidgets.conversation.fragment.ConversationFragment;
 import com.applozic.mobicomkit.uiwidgets.conversation.fragment.MobiComQuickConversationFragment;
+import com.applozic.mobicomkit.uiwidgets.people.contact.DeviceContactSyncService;
 import com.applozic.mobicomkit.uiwidgets.people.fragment.ProfileFragment;
 import com.applozic.mobicommons.commons.core.utils.Utils;
 import com.applozic.mobicommons.people.channel.Channel;
@@ -66,6 +72,8 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
     private BottomNavigationView bottomNavigationView;
     private String currentTab;
     private boolean isStopCalled = false;
+    // Request code for READ_CONTACTS. It can be any number > 0.
+    private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
@@ -111,6 +119,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         initialize();
+        showContacts();
 
         //Put Support Contact Data
         //buildSupportContactData();
@@ -135,6 +144,43 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         fragmentTransaction.replace(R.id.layout_child_activity, selectedFragment);
         fragmentTransaction.commit();
     }*/
+
+    /**
+     * Show the contacts in the ListView.
+     */
+    private void showContacts() {
+        // Check the SDK version and whether the permission is already granted or not.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+
+                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.READ_CONTACTS) !=
+                        PackageManager.PERMISSION_GRANTED){
+
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.READ_CONTACTS},
+                    PERMISSIONS_REQUEST_READ_CONTACTS);
+            //After this point you wait for callback in
+            // onRequestPermissionsResult(int, String[], int[]) override method
+        } else {
+            // Android version is lesser than 6.0 or the permission is already granted.
+            Intent intent = new Intent(this, DeviceContactSyncService.class);
+            DeviceContactSyncService.enqueueWork(this, intent);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        if (requestCode == PERMISSIONS_REQUEST_READ_CONTACTS) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission is granted
+                showContacts();
+            } else {
+                Toast.makeText(this, "Until you grant the permission, we cannot display the names",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }else{
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
 
     private void initialize() {
 
@@ -391,6 +437,9 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                 //Basic settings...
 
                 ApplozicClient.getInstance(context).setContextBasedChat(true).setHandleDial(true);
+
+                ApplozicClient.getInstance(context).enableDeviceContactSync(true);
+
 
                 /*Map<ApplozicSetting.RequestCode, String> activityCallbacks = new HashMap<ApplozicSetting.RequestCode, String>();
                 activityCallbacks.put(ApplozicSetting.RequestCode.USER_LOOUT, HomeActivity.class.getName());

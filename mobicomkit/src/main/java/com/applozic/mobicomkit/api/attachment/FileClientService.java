@@ -18,7 +18,6 @@ import com.applozic.mobicomkit.api.conversation.Message;
 import com.applozic.mobicomkit.api.conversation.database.MessageDatabaseService;
 import com.applozic.mobicomkit.api.conversation.service.ConversationService;
 import com.applozic.mobicomkit.feed.TopicDetail;
-import com.applozic.mobicomkit.listners.MediaUploadProgressHandler;
 import com.applozic.mobicommons.commons.core.utils.Utils;
 import com.applozic.mobicommons.commons.image.ImageUtils;
 import com.applozic.mobicommons.file.FileUtils;
@@ -44,8 +43,8 @@ import java.util.Date;
 public class FileClientService extends MobiComKitClientService {
 
     //Todo: Make the base folder configurable using either strings.xml or properties file
-    public static final String MOBI_COM_IMAGES_FOLDER = "/image";
-    public static final String MOBI_COM_VIDEOS_FOLDER = "/video";
+    public static final String MOBI_COM_IMAGES_FOLDER = "/FarmRise Images"; ///image
+    public static final String MOBI_COM_VIDEOS_FOLDER = "/FarmRise Videos"; ///video
     public static final String MOBI_COM_CONTACT_FOLDER = "/contact";
     public static final String MOBI_COM_OTHER_FILES_FOLDER = "/other";
     public static final String MOBI_COM_THUMBNAIL_SUFIX = "/.Thumbnail";
