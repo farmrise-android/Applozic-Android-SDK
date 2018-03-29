@@ -159,7 +159,7 @@ public class DeviceContactService implements BaseContactService {
             return null;
         }
 
-        Utils.printLog(context, "DeviceContactService", "Modified Display name  : " + displayName);
+        //Utils.printLog(context, "DeviceContactService", "Modified Display name  : " + displayName);
 
         String formattedPhoneNumber = contactNO;
 

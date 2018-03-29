@@ -407,7 +407,7 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
         return loader;*/
 
         if (isDeviceContactSync) {
-            return contactDatabase.getPhoneContactCursorLoader(mSearchTerm, userIdArray, true);
+            return contactDatabase.getPhoneContactCursorLoader(mSearchTerm, userIdArray, false); //true
         } else {
             return contactDatabase.getSearchCursorLoader(mSearchTerm, userIdArray);
         }
@@ -668,6 +668,10 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
                 resultTextView.setVisibility(View.VISIBLE);
                 resultTextView.setText(R.string.no_contacts);
                 startInviteLayout.setVisibility(View.GONE);
+
+                if(displayName.indexOf(mSearchTerm)>0){
+                    resultTextView.setVisibility(View.GONE);
+                }
 
                 return displayName.toLowerCase(Locale.getDefault()).indexOf(
                         mSearchTerm.toLowerCase(Locale.getDefault()));

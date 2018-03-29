@@ -187,6 +187,11 @@
         <!-- Applozic Services -->
 
         <service
+            android:name="com.applozic.mobicomkit.uiwidgets.people.contact.DeviceContactSyncService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <service
             android:name="com.applozic.mobicomkit.api.conversation.MessageIntentService"
             android:permission="android.permission.BIND_JOB_SERVICE"
             android:exported="false" />

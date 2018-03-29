@@ -504,7 +504,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         User user = new User();
         user.setUserId("testapplozicuser7");
         //user.setEmail("pskreddy"@gmail.com);
-        user.setContactNumber("7777777777");
+        user.setContactNumber("+91 7777777777");
         user.setPassword("7777777777");
         user.setDisplayName("Seven"); //display name and user name are similar //Sai //In all contacts, conatct shows with display name and number
         //user.setAuthenticationTypeId(authenticationType.getValue());
