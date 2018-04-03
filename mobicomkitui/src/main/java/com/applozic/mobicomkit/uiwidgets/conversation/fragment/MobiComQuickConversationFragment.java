@@ -387,8 +387,10 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
                 //emptyTextView.setText(!TextUtils.isEmpty(alCustomizationSettings.getNoConversationLabel()) ? alCustomizationSettings.getNoConversationLabel() : getResources().getString(R.string.no_conversation));
                 // startQNewButton.setVisibility(View.GONE);
 
-                menu.findItem(R.id.start_new).setVisible(true);
-                menu.findItem(R.id.menu_search).setVisible(true);
+                if(menu!=null) {
+                    menu.findItem(R.id.start_new).setVisible(true);
+                    menu.findItem(R.id.menu_search).setVisible(true);
+                }
             }
         });
     }

@@ -18,11 +18,13 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.ContextMenu;
 import android.view.Gravity;
@@ -36,6 +38,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -58,6 +61,7 @@ import com.applozic.mobicomkit.feed.GroupInfoUpdate;
 import com.applozic.mobicomkit.feed.RegisteredUsersApiResponse;
 import com.applozic.mobicomkit.uiwidgets.AlCustomizationSettings;
 import com.applozic.mobicomkit.uiwidgets.ApplozicSetting;
+import com.applozic.mobicomkit.uiwidgets.CustomTextViewRegular;
 import com.applozic.mobicomkit.uiwidgets.R;
 import com.applozic.mobicomkit.uiwidgets.alphanumbericcolor.AlphaNumberColorUtil;
 import com.applozic.mobicomkit.uiwidgets.conversation.ConversationUIService;
@@ -103,15 +107,20 @@ public class ChannelInfoActivity extends AppCompatActivity {
     AlCustomizationSettings alCustomizationSettings;
     ConnectivityReceiver connectivityReceiver;
     private ActionBar mActionBar;
-    private ImageLoader contactImageLoader, channelImageLoader;
+    private ImageLoader contactImageLoader;
     private List<ChannelUserMapper> channelUserMapperList;
     private Channel channel;
     private ImageView channelImage;
-    private TextView createdBy, groupParticipantsTexView;
-    private Button exitChannelButton, deleteChannelButton;
-    private RelativeLayout channelDeleteRelativeLayout, channelExitRelativeLayout;
-    private Integer channelKey;
+    private CustomTextViewRegular groupParticipantsTexView;
     private RefreshBroadcast refreshBroadcast;
+    private NestedScrollView nestedScrollView;
+
+    static IntentFilter getIntentFilter() {
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(BroadcastService.INTENT_ACTIONS.UPDATE_GROUP_INFO.toString());
+        intentFilter.addAction(BroadcastService.INTENT_ACTIONS.UPDATE_USER_DETAIL.toString());
+        return intentFilter;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,31 +136,42 @@ public class ChannelInfoActivity extends AppCompatActivity {
         }
         refreshBroadcast = new RefreshBroadcast();
         baseContactService = new AppContactService(getApplicationContext());
-        channelImage = (ImageView) findViewById(R.id.channelImage);
+        channelImage = findViewById(R.id.channelImage);
         userPreference = MobiComUserPreference.getInstance(this);
-        createdBy = (TextView) findViewById(R.id.created_by);
-        groupParticipantsTexView = (TextView) findViewById(R.id.groupParticipantsTexView);
-        exitChannelButton = (Button) findViewById(R.id.exit_channel);
-        //exitChannelButton.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/NotoSans-Regular.ttf"));
-        deleteChannelButton = (Button) findViewById(R.id.delete_channel_button);
-        channelDeleteRelativeLayout = (RelativeLayout) findViewById(R.id.channel_delete_relativeLayout);
-        channelExitRelativeLayout = (RelativeLayout) findViewById(R.id.channel_exit_relativeLayout);
-        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
+        CustomTextViewRegular createdBy = findViewById(R.id.created_by);
+        groupParticipantsTexView = findViewById(R.id.groupParticipantsTexView);
+        Button exitChannelButton = findViewById(R.id.exit_channel);
+        exitChannelButton.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/NotoSans-Regular.ttf"));
+        Button deleteChannelButton = findViewById(R.id.delete_channel_button);
+        deleteChannelButton.setTypeface(Typeface.createFromAsset(getAssets(), "fonts/NotoSans-Regular.ttf"));
+        RelativeLayout channelDeleteRelativeLayout = findViewById(R.id.channel_delete_relativeLayout);
+        RelativeLayout channelExitRelativeLayout = findViewById(R.id.channel_exit_relativeLayout);
+        collapsingToolbarLayout = findViewById(R.id.toolbar_layout);
+        nestedScrollView = findViewById(R.id.nestedScrollView);
+
         collapsingToolbarLayout.setContentScrimColor(Color.parseColor(alCustomizationSettings.getCollapsingToolbarLayoutColor()));
         groupParticipantsTexView.setTextColor(Color.parseColor(alCustomizationSettings.getGroupParticipantsTextColor()));
-        deleteChannelButton.setBackgroundColor(Color.parseColor((alCustomizationSettings.getGroupDeleteButtonBackgroundColor())));
+        //deleteChannelButton.setBackgroundColor(Color.parseColor((alCustomizationSettings.getGroupDeleteButtonBackgroundColor())));
         //exitChannelButton.setBackgroundColor(Color.parseColor(alCustomizationSettings.getGroupExitButtonBackgroundColor()));
 
         mActionBar = getSupportActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
         mActionBar.setHomeButtonEnabled(true);
         mActionBar.setDisplayShowHomeEnabled(true);
-        mainListView = (ListView) findViewById(R.id.mainList);
+        mainListView = findViewById(R.id.mainList);
         mainListView.setLongClickable(true);
         mainListView.setSmoothScrollbarEnabled(true);
         if (Utils.hasLollipop()) {
             mainListView.setNestedScrollingEnabled(true);
         }
+
+        nestedScrollView.post(new Runnable() {
+            @Override
+            public void run() {
+                nestedScrollView.scrollTo(nestedScrollView.getLeft(), groupParticipantsTexView.getTop());
+            }
+        });
+
         connectivityReceiver = new ConnectivityReceiver();
         mobiComKitBroadcastReceiver = new MobiComKitBroadcastReceiver(this);
 
@@ -161,7 +181,7 @@ public class ChannelInfoActivity extends AppCompatActivity {
             channelExitRelativeLayout.setVisibility(View.GONE);
         }
         if (getIntent().getExtras() != null) {
-            channelKey = getIntent().getIntExtra(CHANNEL_KEY, 0);
+            Integer channelKey = getIntent().getIntExtra(CHANNEL_KEY, 0);
             channel = ChannelService.getInstance(this).getChannelByChannelKey(channelKey);
             isUserPresent = ChannelService.getInstance(this).processIsUserPresentInChannel(channelKey);
             if (channel != null) {
@@ -201,7 +221,7 @@ public class ChannelInfoActivity extends AppCompatActivity {
         contactImageLoader.setLoadingImage(R.drawable.applozic_ic_contact_picture_holo_light);
         contactImageLoader.addImageCache(this.getSupportFragmentManager(), 0.1f);
         contactImageLoader.setImageFadeIn(false);
-        channelImageLoader = new ImageLoader(getApplicationContext(), getListPreferredItemHeight()) {
+        ImageLoader channelImageLoader = new ImageLoader(getApplicationContext(), getListPreferredItemHeight()) {
             @Override
             protected Bitmap processBitmap(Object data) {
                 return baseContactService.downloadGroupImage(getApplicationContext(), (Channel) data);
@@ -222,6 +242,8 @@ public class ChannelInfoActivity extends AppCompatActivity {
 
         contactsAdapter = new ContactsAdapter(this);
         mainListView.setAdapter(contactsAdapter);
+
+        Helper.getListViewSize(mainListView);
 
         mainListView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -272,6 +294,7 @@ public class ChannelInfoActivity extends AppCompatActivity {
         super.onResume();
         LocalBroadcastManager.getInstance(this).registerReceiver(mobiComKitBroadcastReceiver, BroadcastService.getIntentFilter());
         LocalBroadcastManager.getInstance(this).registerReceiver(refreshBroadcast, getIntentFilter());
+
         if (channel != null) {
             BroadcastService.currentInfoId = String.valueOf(channel.getKey());
             Channel newChannel = ChannelService.getInstance(this).getChannelByChannelKey(channel.getKey());
@@ -354,7 +377,6 @@ public class ChannelInfoActivity extends AppCompatActivity {
         return true;
 
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -443,7 +465,6 @@ public class ChannelInfoActivity extends AppCompatActivity {
         return false;
     }
 
-
     public void processLoadRegisteredUsers() {
         final ProgressDialog progressDialog = ProgressDialog.show(ChannelInfoActivity.this, "",
                 getString(R.string.applozic_contacts_loading_info), true);
@@ -493,12 +514,13 @@ public class ChannelInfoActivity extends AppCompatActivity {
         return (int) typedValue.getDimension(metrics);
     }
 
-
     public void updateChannelList() {
         if (contactsAdapter != null && channel != null) {
             channelUserMapperList.clear();
             channelUserMapperList = ChannelService.getInstance(this).getListOfUsersFromChannelUserMapper(channel.getKey());
             contactsAdapter.notifyDataSetChanged();
+            Helper.getListViewSize(mainListView);
+
             String oldChannelName = channel.getName();
             channel = ChannelService.getInstance(this).getChannelByChannelKey(channel.getKey());
             if (!oldChannelName.equals(channel.getName())) {
@@ -584,6 +606,7 @@ public class ChannelInfoActivity extends AppCompatActivity {
     }
 
     public void deleteChannel(final Channel channel) {
+
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this).
                 setPositiveButton(R.string.channel_deleting, new DialogInterface.OnClickListener() {
                     @Override
@@ -591,11 +614,13 @@ public class ChannelInfoActivity extends AppCompatActivity {
                         new ChannelMemberAdd(channel, ChannelInfoActivity.this).execute();
                     }
                 });
+
         alertDialog.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
             }
         });
+
         if (channel.getType() != null) {
             alertDialog.setMessage(getString(R.string.delete_channel_messages_and_channel_info).replace(getString(R.string.group_name_info), channel.getName()).replace(getString(R.string.groupType_info), Channel.GroupType.BROADCAST.getValue().equals(channel.getType()) ? getString(R.string.broadcast_string) : getString(R.string.group_string)));
         }
@@ -615,11 +640,35 @@ public class ChannelInfoActivity extends AppCompatActivity {
         }
     }
 
+    private static class Helper {
+
+        static void getListViewSize(ListView myListView) {
+            ListAdapter myListAdapter = myListView.getAdapter();
+            if (myListAdapter == null) {
+                //do nothing return null
+                return;
+            }
+            //set listAdapter in loop for getting final size
+            int totalHeight = 0;
+            for (int size = 0; size < myListAdapter.getCount(); size++) {
+                View listItem = myListAdapter.getView(size, null, myListView);
+                listItem.measure(0, 0);
+                totalHeight += listItem.getMeasuredHeight();
+            }
+            //setting listview item in adapter
+            ViewGroup.LayoutParams params = myListView.getLayoutParams();
+            params.height = totalHeight + (myListView.getDividerHeight() * (myListAdapter.getCount() - 1));
+            myListView.setLayoutParams(params);
+            // print height of adapter on log
+            Log.i("height of listItem:", String.valueOf(totalHeight));
+        }
+    }
+
     private class ContactsAdapter extends BaseAdapter {
         Context context;
         private LayoutInflater mInflater;
 
-        public ContactsAdapter(Context context) {
+        ContactsAdapter(Context context) {
             this.context = context;
             mInflater = LayoutInflater.from(context);
         }
@@ -635,11 +684,11 @@ public class ChannelInfoActivity extends AppCompatActivity {
                 convertView =
                         mInflater.inflate(R.layout.contact_users_layout, parent, false);
                 holder = new ContactViewHolder();
-                holder.displayName = (TextView) convertView.findViewById(R.id.displayName);
-                holder.alphabeticImage = (TextView) convertView.findViewById(R.id.alphabeticImage);
-                holder.circleImageView = (CircleImageView) convertView.findViewById(R.id.contactImage);
-                holder.adminTextView = (TextView) convertView.findViewById(R.id.adminTextView);
-                holder.lastSeenAtTextView = (TextView) convertView.findViewById(R.id.lastSeenAtTextView);
+                holder.displayName = convertView.findViewById(R.id.displayName);
+                holder.alphabeticImage = convertView.findViewById(R.id.alphabeticImage);
+                holder.circleImageView = convertView.findViewById(R.id.contactImage);
+                holder.adminTextView = convertView.findViewById(R.id.adminTextView);
+                holder.lastSeenAtTextView = convertView.findViewById(R.id.lastSeenAtTextView);
                 convertView.setTag(holder);
             } else {
                 holder = (ContactViewHolder) convertView.getTag();
@@ -721,7 +770,7 @@ public class ChannelInfoActivity extends AppCompatActivity {
 
     }
 
-    public class ChannelMember extends AsyncTask<Void, Integer, Long> {
+    private class ChannelMember extends AsyncTask<Void, Integer, Long> {
         String responseForRemove;
         private ChannelUserMapper channelUserMapper;
         private ChannelService channelService;
@@ -730,14 +779,13 @@ public class ChannelInfoActivity extends AppCompatActivity {
         private Channel channel;
 
 
-        public ChannelMember(ChannelUserMapper channelUserMapper, Channel channel, Context context) {
+        ChannelMember(ChannelUserMapper channelUserMapper, Channel channel, Context context) {
             this.channelUserMapper = channelUserMapper;
             this.channel = channel;
             this.context = context;
             this.channelService = ChannelService.getInstance(context);
 
         }
-
 
         @Override
         protected void onPreExecute() {
@@ -769,6 +817,7 @@ public class ChannelInfoActivity extends AppCompatActivity {
                 if (channelUserMapperList != null && channelUserMapperList.size() > 0) {
                     channelUserMapperList.remove(channelUserMapper);
                     contactsAdapter.notifyDataSetChanged();
+                    Helper.getListViewSize(mainListView);
                 }
             }
         }
@@ -776,15 +825,15 @@ public class ChannelInfoActivity extends AppCompatActivity {
     }
 
     private class ContactViewHolder {
-        public TextView displayName, alphabeticImage, adminTextView, lastSeenAtTextView;
-        public CircleImageView circleImageView;
+        TextView displayName, alphabeticImage, adminTextView, lastSeenAtTextView;
+        CircleImageView circleImageView;
 
-        public ContactViewHolder() {
+        ContactViewHolder() {
         }
 
     }
 
-    public class ChannelMemberAdd extends AsyncTask<Void, Integer, Long> {
+    private class ChannelMemberAdd extends AsyncTask<Void, Integer, Long> {
         ApiResponse apiResponse;
         String responseForDeleteGroup;
         String userId;
@@ -794,14 +843,14 @@ public class ChannelInfoActivity extends AppCompatActivity {
         private Channel channel;
 
 
-        public ChannelMemberAdd(Channel channel, String userId, Context context) {
+        ChannelMemberAdd(Channel channel, String userId, Context context) {
             this.channel = channel;
             this.context = context;
             this.userId = userId;
             this.channelService = ChannelService.getInstance(context);
         }
 
-        public ChannelMemberAdd(Channel channel, Context context) {
+        ChannelMemberAdd(Channel channel, Context context) {
             this.channel = channel;
             this.context = context;
             this.channelService = ChannelService.getInstance(context);
@@ -846,6 +895,7 @@ public class ChannelInfoActivity extends AppCompatActivity {
                     ChannelUserMapper channelUserMapper = new ChannelUserMapper(channel.getKey(), userId);
                     channelUserMapperList.add(channelUserMapper);
                     contactsAdapter.notifyDataSetChanged();
+                    Helper.getListViewSize(mainListView);
                 } else {
                     List<ErrorResponseFeed> error = apiResponse.getErrorResponse();
                     if (error != null && error.size() > 0) {
@@ -874,7 +924,7 @@ public class ChannelInfoActivity extends AppCompatActivity {
         }
     }
 
-    public class ChannelAsync extends AsyncTask<Void, Integer, Long> {
+    private class ChannelAsync extends AsyncTask<Void, Integer, Long> {
         GroupInfoUpdate groupInfoUpdate;
         String responseForExit;
         String responseForChannelUpdate;
@@ -883,14 +933,14 @@ public class ChannelInfoActivity extends AppCompatActivity {
         private Context context;
         private Channel channel;
 
-        public ChannelAsync(Channel channel, Context context) {
+        ChannelAsync(Channel channel, Context context) {
             this.channel = channel;
             this.context = context;
             this.channelService = ChannelService.getInstance(context);
 
         }
 
-        public ChannelAsync(GroupInfoUpdate groupInfoUpdate, Context context) {
+        ChannelAsync(GroupInfoUpdate groupInfoUpdate, Context context) {
             this.groupInfoUpdate = groupInfoUpdate;
             this.context = context;
             this.channelService = ChannelService.getInstance(context);
@@ -973,7 +1023,6 @@ public class ChannelInfoActivity extends AppCompatActivity {
         }
     }
 
-
     public class RefreshBroadcast extends BroadcastReceiver {
 
         @Override
@@ -982,23 +1031,15 @@ public class ChannelInfoActivity extends AppCompatActivity {
         }
     }
 
-    static IntentFilter getIntentFilter(){
-        IntentFilter intentFilter =  new IntentFilter();
-        intentFilter.addAction(BroadcastService.INTENT_ACTIONS.UPDATE_GROUP_INFO.toString());
-        intentFilter.addAction(BroadcastService.INTENT_ACTIONS.UPDATE_USER_DETAIL.toString());
-        return intentFilter;
-    }
-
-
-    public class ChannelUserRoleAsyncTask extends AsyncTask<Void, Integer, Long> {
-        private ChannelService channelService;
-        private ProgressDialog progressDialog;
-        private Context context;
+    private class ChannelUserRoleAsyncTask extends AsyncTask<Void, Integer, Long> {
         ChannelUserMapper channelUserMapper;
         String response;
         GroupInfoUpdate groupInfoUpdate;
+        private ChannelService channelService;
+        private ProgressDialog progressDialog;
+        private Context context;
 
-        public ChannelUserRoleAsyncTask(ChannelUserMapper channelUserMapper, GroupInfoUpdate groupInfoUpdate, Context context) {
+        ChannelUserRoleAsyncTask(ChannelUserMapper channelUserMapper, GroupInfoUpdate groupInfoUpdate, Context context) {
             this.channelUserMapper = channelUserMapper;
             this.context = context;
             this.groupInfoUpdate = groupInfoUpdate;
@@ -1040,6 +1081,7 @@ public class ChannelInfoActivity extends AppCompatActivity {
                         channelUserMapperList.remove(channelUserMapper);
                         channelUserMapperList.add(index, channelUserMapper);
                         contactsAdapter.notifyDataSetChanged();
+                        Helper.getListViewSize(mainListView);
                     } catch (Exception e) {
 
                     }

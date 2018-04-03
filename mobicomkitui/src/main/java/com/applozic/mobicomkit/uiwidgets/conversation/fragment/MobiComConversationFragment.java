@@ -470,8 +470,10 @@ abstract public class MobiComConversationFragment extends Fragment implements Vi
 
             @Override
             public void onTick(long millisUntilFinished) {
-                count++;
+
                 seconds = count;
+                count++;
+
                 if (seconds == 60) {
                     minutes++;
                     count = 0;

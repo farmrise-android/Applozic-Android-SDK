@@ -669,9 +669,9 @@ public class AppContactFragment extends ListFragment implements SearchListFragme
                 resultTextView.setText(R.string.no_contacts);
                 startInviteLayout.setVisibility(View.GONE);
 
-                if(displayName.indexOf(mSearchTerm)>0){
+               /* if(displayName.indexOf(mSearchTerm)>0){
                     resultTextView.setVisibility(View.GONE);
-                }
+                }*/
 
                 return displayName.toLowerCase(Locale.getDefault()).indexOf(
                         mSearchTerm.toLowerCase(Locale.getDefault()));
