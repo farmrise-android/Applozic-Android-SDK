@@ -128,7 +128,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         bottomNavigationView.setSelectedItemId(R.id.action_home);
         mobiComQuickConversationFragment = new MobiComQuickConversationFragment();
         conversationUIService = new ConversationUIService(this, mobiComQuickConversationFragment);
-        mobiComKitBroadcastReceiver = new MobiComKitBroadcastReceiver(this, conversationUIService);
+        mobiComKitBroadcastReceiver = new MobiComKitBroadcastReceiver(this, mobiComQuickConversationFragment);
 
         Intent lastSeenStatusIntent = new Intent(this, UserIntentService.class);
         lastSeenStatusIntent.putExtra(UserIntentService.USER_LAST_SEEN_AT_STATUS, true);

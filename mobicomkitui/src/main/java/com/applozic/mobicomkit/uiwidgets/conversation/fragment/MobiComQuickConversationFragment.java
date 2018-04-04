@@ -246,32 +246,40 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
         this.menu = menu;
 
         MenuItem searchItem = menu.findItem(R.id.menu_search);
-        searchItem.setVisible(true);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setQueryHint(getResources().getString(R.string.search_hint));
-        if (Utils.hasICS()) {
-            searchItem.collapseActionView();
+        if(searchItem!=null) {
+            searchItem.setVisible(true);
+            SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+            searchView.setQueryHint(getResources().getString(R.string.search_hint));
+            if (Utils.hasICS()) {
+                searchItem.collapseActionView();
+            }
+            searchView.setOnQueryTextListener(this);
+            searchView.setSubmitButtonEnabled(true);
+            searchView.setIconified(true);
         }
-        searchView.setOnQueryTextListener(this);
-        searchView.setSubmitButtonEnabled(true);
-        searchView.setIconified(true);
 
 
-        if (alCustomizationSettings.isStartNewButton() || ApplozicSetting.getInstance(getContext()).isStartNewButtonVisible()) {
-            menu.findItem(R.id.start_new).setVisible(true);
-        }
-        if (alCustomizationSettings.isStartNewGroup() || ApplozicSetting.getInstance(getContext()).isStartNewGroupButtonVisible()) {
-            menu.findItem(R.id.conversations).setVisible(true);
-        }
-        if (alCustomizationSettings.isRefreshOption()) {
-            menu.findItem(R.id.refresh).setVisible(true);
-        }
-        if (alCustomizationSettings.isProfileOption()) {
-            menu.findItem(R.id.applozicUserProfile).setVisible(true);
-        }
-        if (alCustomizationSettings.isMessageSearchOption()) {
-            menu.findItem(R.id.menu_search).setVisible(true);
-        }
+            if (alCustomizationSettings.isStartNewButton() || ApplozicSetting.getInstance(getContext()).isStartNewButtonVisible()) {
+               if(menu.findItem(R.id.start_new)!=null)
+                menu.findItem(R.id.start_new).setVisible(true);
+            }
+            if (alCustomizationSettings.isStartNewGroup() || ApplozicSetting.getInstance(getContext()).isStartNewGroupButtonVisible()) {
+                if(menu.findItem(R.id.conversations)!=null)
+                menu.findItem(R.id.conversations).setVisible(true);
+            }
+            if (alCustomizationSettings.isRefreshOption()) {
+                if(menu.findItem(R.id.refresh)!=null)
+                menu.findItem(R.id.refresh).setVisible(true);
+            }
+            if (alCustomizationSettings.isProfileOption()) {
+                if(menu.findItem(R.id.applozicUserProfile)!=null)
+                menu.findItem(R.id.applozicUserProfile).setVisible(true);
+            }
+            if (alCustomizationSettings.isMessageSearchOption()) {
+                if(menu.findItem(R.id.menu_search)!=null)
+                menu.findItem(R.id.menu_search).setVisible(true);
+            }
+
         /*if (alCustomizationSettings.isBroadcastOption()) {
             menu.findItem(R.id.broadcast).setVisible(true);
         }
@@ -622,8 +630,10 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
             emptyTextView.setVisibility(View.GONE);
             startChatLayout.setVisibility(View.VISIBLE);
 
-            menu.findItem(R.id.start_new).setVisible(false);
-            menu.findItem(R.id.menu_search).setVisible(false);
+            if(menu!=null) {
+                menu.findItem(R.id.start_new).setVisible(false);
+                menu.findItem(R.id.menu_search).setVisible(false);
+            }
 
         } else {
             emptyTextView.setVisibility(View.GONE);
@@ -1009,8 +1019,10 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
                         startChatLayout.setVisibility(View.GONE);
 
                         if(messageList.size()>0){
-                            menu.findItem(R.id.start_new).setVisible(true);
-                            menu.findItem(R.id.menu_search).setVisible(true);
+                            if(menu!=null) {
+                                menu.findItem(R.id.start_new).setVisible(true);
+                                menu.findItem(R.id.menu_search).setVisible(true);
+                            }
                         }
 
                         if (!TextUtils.isEmpty(searchString) && messageList.isEmpty()) {
@@ -1028,8 +1040,10 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
                             emptyTextView.setVisibility(View.GONE);
                             startChatLayout.setVisibility(View.VISIBLE);
 
-                            menu.findItem(R.id.start_new).setVisible(false);
-                            menu.findItem(R.id.menu_search).setVisible(false);
+                            if(menu!=null) {
+                                menu.findItem(R.id.start_new).setVisible(false);
+                                menu.findItem(R.id.menu_search).setVisible(false);
+                            }
 
                         }
                     }

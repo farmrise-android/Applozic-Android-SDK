@@ -307,6 +307,12 @@ public class ChannelFragment extends ListFragment implements
             if (!TextUtils.isEmpty(mSearchTerm)) {
                 resultTextView.setVisibility(View.VISIBLE);
                 resultTextView.setText(R.string.no_groups);
+                if (!mSearchTerm.contains(displayName)) {
+                    resultTextView.setVisibility(View.GONE);
+                }else{
+                    resultTextView.setVisibility(View.VISIBLE);
+                }
+
                 return displayName.toLowerCase(Locale.getDefault()).indexOf(mSearchTerm.toLowerCase(Locale.getDefault()));
             }else{
                 resultTextView.setVisibility(View.GONE);
