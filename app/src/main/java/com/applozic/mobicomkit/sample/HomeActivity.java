@@ -91,7 +91,6 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                     break;
 
             }
-
             return true;
 
         }
