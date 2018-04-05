@@ -185,7 +185,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
     private void initialize() {
 
         //Set Up BottomNavigationView
-        bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
+        bottomNavigationView = findViewById(R.id.navigation);
         BottomNavigationViewHelper.disableShiftMode(bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
@@ -210,6 +210,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         switch (tabId) {
             case TAB_HOME:
                 pushFragments(tabId, new HomeFragment(), true);
+                updateConversationsList();
                 break;
             case TAB_CHAT:
 
@@ -238,6 +239,14 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
             pushFragments(tabId, mStacks.get(tabId).lastElement(), false);
         }*/
     }
+
+    //method to update the conversations list when switching the tabs
+    private void updateConversationsList() {
+        if (mobiComQuickConversationFragment != null) {
+            mobiComQuickConversationFragment.onQueryTextChange(null);
+        }
+    }
+
 
     public void pushFragments(String tag, Fragment fragment, boolean shouldAdd) {
 

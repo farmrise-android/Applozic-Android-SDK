@@ -254,7 +254,7 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
                 searchItem.collapseActionView();
             }
             searchView.setOnQueryTextListener(this);
-            searchView.setSubmitButtonEnabled(true);
+            //searchView.setSubmitButtonEnabled(true);
             searchView.setIconified(true);
         }
 
