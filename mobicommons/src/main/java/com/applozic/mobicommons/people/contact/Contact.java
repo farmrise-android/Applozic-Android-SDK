@@ -103,6 +103,9 @@ public class Contact extends JsonMarker {
     }
 
     public void setDeviceContactType(Short contactType) {
+        if(contactType == null){
+            return;
+        }
         this.deviceContactType = contactType;
         setApplozicType(ContactType.APPLOZIC.getValue().equals(this.deviceContactType) || ContactType.DEVICE_AND_APPLOZIC.getValue().equals(this.deviceContactType));
     }
@@ -118,9 +121,7 @@ public class Contact extends JsonMarker {
     public void processContactNumbers(Context context) {
         TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         String countryCode = telephonyManager.getSimCountryIso().toUpperCase();
-        if (TextUtils.isEmpty(getFormattedContactNumber())) {
-            //setFormattedContactNumber(ContactNumberUtils.getPhoneNumber(getContactNumber(), countryCode));
-
+        if (TextUtils.isEmpty(formattedContactNumber)) {
             if (((ALContactProcessor) context.getApplicationContext()) != null) {
                 setFormattedContactNumber(((ALContactProcessor) context.getApplicationContext()).processContact(getContactNumber(), countryCode));
             }
@@ -265,7 +266,7 @@ public class Contact extends JsonMarker {
 
     public String getDisplayName() {
 
-        if (deviceContactType != null && (ContactType.DEVICE.getValue().equals(deviceContactType) || ContactType.DEVICE_AND_APPLOZIC.getValue().equals(deviceContactType))) {
+        if (formattedContactNumber != null) {
             return TextUtils.isEmpty(phoneDisplayName) ? TextUtils.isEmpty(getFormattedContactNumber()) ? getContactIds() : getFormattedContactNumber() : phoneDisplayName;
         }
 
@@ -273,7 +274,7 @@ public class Contact extends JsonMarker {
     }
 
     public String getFullName() {
-        if (deviceContactType != null && (ContactType.DEVICE.getValue().equals(deviceContactType) || ContactType.DEVICE_AND_APPLOZIC.getValue().equals(deviceContactType))) {
+        if (formattedContactNumber != null) {
             return TextUtils.isEmpty(phoneDisplayName) ? fullName : phoneDisplayName;
         }
         return fullName == null ? "" : fullName;
