@@ -54,7 +54,9 @@
             android:exported="true"
             android:launchMode="singleTop"
             android:label="@string/ecommerce"
-            android:theme="@style/FarmRiseTheme"/>
+            android:theme="@style/FarmRiseTheme"
+            android:windowSoftInputMode="adjustPan"/>
+
         <activity
             android:name="com.applozic.mobicomkit.uiwidgets.conversation.activity.ConversationActivity"
             android:configChanges="keyboardHidden|screenSize|locale|smallestScreenSize|screenLayout|orientation"

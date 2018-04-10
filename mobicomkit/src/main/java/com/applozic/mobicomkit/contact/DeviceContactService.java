@@ -159,42 +159,35 @@ public class DeviceContactService implements BaseContactService {
             return null;
         }
 
-        //Utils.printLog(context, "DeviceContactService", "Modified Display name  : " + displayName);
-
         String formattedPhoneNumber = contactNO;
 
         TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         String countryCode = telephonyManager.getSimCountryIso().toUpperCase();
-        if (((ALContactProcessor) context.getApplicationContext()) != null) {
-            formattedPhoneNumber = ((ALContactProcessor) context.getApplicationContext()).processContact(contactNO, countryCode);
+        try {
+            if (context.getApplicationContext() instanceof ALContactProcessor) {
+                formattedPhoneNumber = ((ALContactProcessor) context.getApplicationContext()).processContact(contactNO, countryCode);
+            }
+        } catch (ClassCastException e) {
+
         }
 
         ContactDatabase contactDatabase = new ContactDatabase(context);
         Contact contact = contactDatabase.getContactByPhoneNo(formattedPhoneNumber);
         Contact contactByLookupKey = contactDatabase.getContactById(lookupKey);
 
-        /*if (contactDatabase.isContactPresent(formattedPhoneNumber, Contact.ContactType.DEVICE_AND_APPLOZIC)) {
+        if (contactDatabase.isContactPresent(formattedPhoneNumber, Contact.ContactType.DEVICE_AND_APPLOZIC)) {
+            if (!displayName.equals(contact.getPhoneDisplayName())) {
+                contactDatabase.updatePhoneContactDisplayName(formattedPhoneNumber, displayName, Contact.ContactType.DEVICE_AND_APPLOZIC.getValue());
+            }
             return null;
-        }*/
+        }
 
         if (contact != null) {
             //Log.d(TAG, "Contact is present with the same phone number: " + formattedPhoneNumber);
             lookupKey = contact.getUserId();
-            if (!displayName.equals(contact.getPhoneDisplayName())) {
-                contactDatabase.updatePhoneContactDisplayName(formattedPhoneNumber, displayName, contact.getDeviceContactType());
-                return contact;
-            }
         } else if (contactByLookupKey != null) {
             //Log.d(TAG, "Contact is present with the same lookupkey: " + lookupKey);
             lookupKey = lookupKey + "-" + formattedPhoneNumber;
-            if (!displayName.equals(contactByLookupKey.getPhoneDisplayName())) {
-                contactDatabase.updateContact(contactByLookupKey);
-                return contactByLookupKey;
-            }
-        }
-
-        if (contactDatabase.isContactPresent(formattedPhoneNumber, Contact.ContactType.DEVICE_AND_APPLOZIC)) {
-            return null;
         }
 
         Contact newContact = new Contact();
@@ -243,6 +236,9 @@ public class DeviceContactService implements BaseContactService {
                 if (cursorPhone != null && cursorPhone.getCount() > 0) {
                     while (cursorPhone.moveToNext()) {
                         Contact contact = getContactFromContactCursor(cursorPhone);
+                        if (contact == null) {
+                            continue;
+                        }
                         appContactService.upsert(contact);
                         contactNumberList.add(contact.getFormattedContactNumber());
                     }

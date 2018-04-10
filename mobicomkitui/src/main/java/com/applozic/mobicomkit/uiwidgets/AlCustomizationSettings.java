@@ -450,8 +450,9 @@ public class AlCustomizationSettings extends JsonMarker {
     }
 
     public String getGroupDeletePackageName() {
-        return groupDeletePackageName;
-    }
+
+           return groupDeletePackageName;
+          }
 
     public String getThemeColorPrimary() {
         return themeColorPrimary;

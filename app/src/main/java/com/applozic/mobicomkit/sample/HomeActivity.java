@@ -1,6 +1,5 @@
 package com.applozic.mobicomkit.sample;
 
-import android.*;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -38,6 +38,7 @@ import com.applozic.mobicomkit.broadcast.BroadcastService;
 import com.applozic.mobicomkit.contact.AppContactService;
 import com.applozic.mobicomkit.contact.database.ContactDatabase;
 import com.applozic.mobicomkit.uiwidgets.ApplozicSetting;
+import com.applozic.mobicomkit.uiwidgets.ContactsChangeObserver;
 import com.applozic.mobicomkit.uiwidgets.conversation.ConversationUIService;
 import com.applozic.mobicomkit.uiwidgets.conversation.MessageCommunicator;
 import com.applozic.mobicomkit.uiwidgets.conversation.MobiComKitBroadcastReceiver;
@@ -68,13 +69,14 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
     ConversationUIService conversationUIService;
     MobiComQuickConversationFragment mobiComQuickConversationFragment;
     MobiComKitBroadcastReceiver mobiComKitBroadcastReceiver;
-
     private HashMap<String, Stack<Fragment>> mStacks;
     private BottomNavigationView bottomNavigationView;
     private String currentTab;
     private boolean isStopCalled = false;
     // Request code for READ_CONTACTS. It can be any number > 0.
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
+    private ContactsChangeObserver observer;
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
@@ -92,7 +94,6 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                     break;
 
             }
-
             return true;
 
         }
@@ -138,6 +139,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         mActionBar = getSupportActionBar();
         //Used to select an item programmatically
         //bottomNavigationView.getMenu().getItem(2).setChecked(true);
+
         try {
             if (getIntent() != null && getIntent().getExtras() != null && getIntent().getExtras().getBoolean(ConversationUIService.FROM_GROUP_DELETE)) {
                 bottomNavigationView.setSelectedItemId(R.id.action_chat);
@@ -169,8 +171,8 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
             // onRequestPermissionsResult(int, String[], int[]) override method
         } else {
             // Android version is lesser than 6.0 or the permission is already granted.
-            Intent intent = new Intent(this, DeviceContactSyncService.class);
-            DeviceContactSyncService.enqueueWork(this, intent);
+            /*Intent intent = new Intent(this, DeviceContactSyncService.class);
+            DeviceContactSyncService.enqueueWork(this, intent);*/
         }
     }
 
@@ -193,7 +195,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
     private void initialize() {
 
         //Set Up BottomNavigationView
-        bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
+        bottomNavigationView = findViewById(R.id.navigation);
         BottomNavigationViewHelper.disableShiftMode(bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
@@ -217,6 +219,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         switch (tabId) {
             case TAB_HOME:
                 pushFragments(tabId, new HomeFragment(), true);
+                updateConversationsList();
                 break;
             case TAB_CHAT:
 
@@ -245,6 +248,14 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
             pushFragments(tabId, mStacks.get(tabId).lastElement(), false);
         }*/
     }
+
+    //method to update the conversations list when switching the tabs
+    private void updateConversationsList() {
+        if (mobiComQuickConversationFragment != null) {
+            mobiComQuickConversationFragment.onQueryTextChange(null);
+        }
+    }
+
 
     public void pushFragments(String tag, Fragment fragment, boolean shouldAdd) {
 
@@ -415,7 +426,16 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         LocalBroadcastManager.getInstance(this).registerReceiver(mobiComKitBroadcastReceiver, BroadcastService.getIntentFilter());
         Intent subscribeIntent = new Intent(this, ApplozicMqttIntentService.class);
         subscribeIntent.putExtra(ApplozicMqttIntentService.SUBSCRIBE, true);
+
+        //startService(subscribeIntent);
+
         ApplozicMqttIntentService.enqueueWork(HomeActivity.this, subscribeIntent);
+
+        if (observer != null && MobiComUserPreference.getInstance(this).isLoggedIn()) {
+            getApplicationContext().getContentResolver().registerContentObserver(
+                    ContactsContract.Contacts.CONTENT_URI, true, observer);
+        }
+
 
         if (!Utils.isInternetAvailable(this)) {
             String errorMessage = getResources().getString(R.string.internet_connection_not_available);
@@ -426,12 +446,19 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
     @Override
     protected void onPause() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mobiComKitBroadcastReceiver);
-        final String deviceKeyString = MobiComUserPreference.getInstance(this).getDeviceKeyString();
-        final String userKeyString = MobiComUserPreference.getInstance(this).getSuUserKeyString();
-        Intent intent = new Intent(this, ApplozicMqttIntentService.class);
-        intent.putExtra(ApplozicMqttIntentService.USER_KEY_STRING, userKeyString);
-        intent.putExtra(ApplozicMqttIntentService.DEVICE_KEY_STRING, deviceKeyString);
-        ApplozicMqttIntentService.enqueueWork(HomeActivity.this, intent);
+
+//<<<<<<< HEAD
+//        final String deviceKeyString = MobiComUserPreference.getInstance(this).getDeviceKeyString();
+//        final String userKeyString = MobiComUserPreference.getInstance(this).getSuUserKeyString();
+//        Intent intent = new Intent(this, ApplozicMqttIntentService.class);
+//        intent.putExtra(ApplozicMqttIntentService.USER_KEY_STRING, userKeyString);
+//        intent.putExtra(ApplozicMqttIntentService.DEVICE_KEY_STRING, deviceKeyString);
+//        ApplozicMqttIntentService.enqueueWork(HomeActivity.this, intent);
+//
+        if (observer != null && MobiComUserPreference.getInstance(this).isLoggedIn()) {
+            getApplicationContext().getContentResolver().unregisterContentObserver(observer);
+        }
+
         super.onPause();
     }
 
@@ -446,6 +473,9 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                 ApplozicClient.getInstance(context).setContextBasedChat(true).setHandleDial(true);
 
                 ApplozicClient.getInstance(context).enableDeviceContactSync(true);
+
+                Intent intent = new Intent(context, DeviceContactSyncService.class);
+                DeviceContactSyncService.enqueueWork(context, intent);
 
 
                 /*Map<ApplozicSetting.RequestCode, String> activityCallbacks = new HashMap<ApplozicSetting.RequestCode, String>();
