@@ -123,7 +123,6 @@
     <orderEntry type="library" exported="" name="firebase-iid-license-11.8.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-location-11.8.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-location-license-11.8.0" level="project" />
-    <orderEntry type="library" exported="" name="exifinterface-27.1.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-maps-11.8.0" level="project" />
     <orderEntry type="library" exported="" name="design-27.1.0" level="project" />
     <orderEntry type="library" exported="" name="transition-27.1.0" level="project" />
@@ -143,7 +142,5 @@
     <orderEntry type="library" exported="" name="android-image-cropper-2.6.0" level="project" />
     <orderEntry type="module" module-name="mobicomkit" exported="" />
     <orderEntry type="module" module-name="mobicommons" exported="" />
-    <orderEntry type="library" exported="" name="org.eclipse.paho.client.mqttv3-1.2.0" level="project" />
-    <orderEntry type="library" exported="" name="org.eclipse.paho.android.service-1.1.1" level="project" />
   </component>
 </module>
