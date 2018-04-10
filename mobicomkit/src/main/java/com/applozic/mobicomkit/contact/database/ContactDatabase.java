@@ -77,8 +77,6 @@ public class ContactDatabase {
             contact.setLastMessageAtTime(cursor.getLong(cursor.getColumnIndex(MobiComDatabaseHelper.LAST_MESSAGED_AT)));
 
             if (ApplozicClient.getInstance(context).isDeviceContactSync()) {
-                //String phoneDisplayName = getContactName(contact.getFormattedContactNumber());
-                //contact.setPhoneDisplayName(!TextUtils.isEmpty(phoneDisplayName) ? phoneDisplayName : cursor.getString(cursor.getColumnIndex(MobiComDatabaseHelper.PHONE_CONTACT_DISPLAY_NAME)));
                 contact.setDeviceContactType(cursor.getShort(cursor.getColumnIndex(MobiComDatabaseHelper.DEVICE_CONTACT_TYPE)));
                 contact.setPhoneDisplayName(cursor.getString(cursor.getColumnIndex(MobiComDatabaseHelper.PHONE_CONTACT_DISPLAY_NAME)));
             }
@@ -257,10 +255,12 @@ public class ContactDatabase {
         contentValues.put(MobiComDatabaseHelper.FULL_NAME, getFullNameForUpdate(contact));
 
         if (ApplozicClient.getInstance(context).isDeviceContactSync()) {
+
             if (contact.getDeviceContactType() != null) {
                 contentValues.put(MobiComDatabaseHelper.DEVICE_CONTACT_TYPE, contact.getDeviceContactType());
                 contentValues.put(MobiComDatabaseHelper.APPLOZIC_TYPE, contact.isApplozicType() ? 1 : 0);
             }
+
             if (!TextUtils.isEmpty(contact.getFormattedContactNumber())) {
                 contentValues.put(MobiComDatabaseHelper.CONTACT_NO, contact.getFormattedContactNumber());
             }
@@ -318,7 +318,9 @@ public class ContactDatabase {
         contentValues.put(MobiComDatabaseHelper.USER_ROLE_TYPE, contact.getRoleType());
         contentValues.put(MobiComDatabaseHelper.LAST_MESSAGED_AT, contact.getLastMessageAtTime());
         contentValues.put(MobiComDatabaseHelper.USER_TYPE_ID, contact.getUserTypeId());
-        contentValues.put(MobiComDatabaseHelper.DELETED_AT, contact.getDeletedAtTime());
+        if (contact.getDeletedAtTime() != null && contact.getDeletedAtTime() != 0) {
+            contentValues.put(MobiComDatabaseHelper.DELETED_AT, contact.getDeletedAtTime());
+        }
         return contentValues;
     }
 
@@ -627,7 +629,9 @@ public class ContactDatabase {
         if (existingContact == null) {
             addContact(contact);
         } else {
-            if (Contact.ContactType.DEVICE_AND_APPLOZIC.getValue().equals(contact.getDeviceContactType())) {
+            if (Contact.ContactType.DEVICE_AND_APPLOZIC.getValue().equals(existingContact.getDeviceContactType())) {
+                contact.setDeviceContactType(existingContact.getDeviceContactType());
+            }else if(Contact.ContactType.DEVICE_AND_APPLOZIC.getValue().equals(contact.getDeviceContactType())){
                 contact.setDeviceContactType(existingContact.getDeviceContactType());
             }
             updateContact(contact);

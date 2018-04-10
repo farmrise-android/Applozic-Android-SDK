@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -37,6 +38,7 @@ import com.applozic.mobicomkit.broadcast.BroadcastService;
 import com.applozic.mobicomkit.contact.AppContactService;
 import com.applozic.mobicomkit.contact.database.ContactDatabase;
 import com.applozic.mobicomkit.uiwidgets.ApplozicSetting;
+import com.applozic.mobicomkit.uiwidgets.ContactsChangeObserver;
 import com.applozic.mobicomkit.uiwidgets.conversation.ConversationUIService;
 import com.applozic.mobicomkit.uiwidgets.conversation.MessageCommunicator;
 import com.applozic.mobicomkit.uiwidgets.conversation.MobiComKitBroadcastReceiver;
@@ -74,6 +76,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
     private boolean isStopCalled = false;
     // Request code for READ_CONTACTS. It can be any number > 0.
     private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
+    private ContactsChangeObserver observer;
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
@@ -152,7 +155,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
 
                 ActivityCompat.checkSelfPermission(this, android.Manifest.permission.READ_CONTACTS) !=
-                        PackageManager.PERMISSION_GRANTED){
+                        PackageManager.PERMISSION_GRANTED) {
 
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.READ_CONTACTS},
                     PERMISSIONS_REQUEST_READ_CONTACTS);
@@ -160,8 +163,8 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
             // onRequestPermissionsResult(int, String[], int[]) override method
         } else {
             // Android version is lesser than 6.0 or the permission is already granted.
-            Intent intent = new Intent(this, DeviceContactSyncService.class);
-            DeviceContactSyncService.enqueueWork(this, intent);
+            /*Intent intent = new Intent(this, DeviceContactSyncService.class);
+            DeviceContactSyncService.enqueueWork(this, intent);*/
         }
     }
 
@@ -176,7 +179,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                 Toast.makeText(this, "Until you grant the permission, we cannot display the names",
                         Toast.LENGTH_SHORT).show();
             }
-        }else{
+        } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
@@ -257,7 +260,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                         !getSupportFragmentManager().isDestroyed()) {
 
                     if (shouldAdd)
-                    mStacks.get(tag).push(fragment);
+                        mStacks.get(tag).push(fragment);
                     //FragmentManager manager = getSupportFragmentManager();
                     FragmentTransaction ft = manager.beginTransaction();
                     ft.replace(R.id.layout_child_activity, fragment);
@@ -424,6 +427,11 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         subscribeIntent.putExtra(ApplozicMqttIntentService.SUBSCRIBE, true);
         startService(subscribeIntent);
 
+        if (observer != null && MobiComUserPreference.getInstance(this).isLoggedIn()) {
+            getApplicationContext().getContentResolver().registerContentObserver(
+                    ContactsContract.Contacts.CONTENT_URI, true, observer);
+        }
+
         if (!Utils.isInternetAvailable(this)) {
             String errorMessage = getResources().getString(R.string.internet_connection_not_available);
             showErrorMessageView(errorMessage);
@@ -433,6 +441,9 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
     @Override
     protected void onPause() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mobiComKitBroadcastReceiver);
+        if (observer != null && MobiComUserPreference.getInstance(this).isLoggedIn()) {
+            getApplicationContext().getContentResolver().unregisterContentObserver(observer);
+        }
         super.onPause();
     }
 
@@ -447,6 +458,9 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                 ApplozicClient.getInstance(context).setContextBasedChat(true).setHandleDial(true);
 
                 ApplozicClient.getInstance(context).enableDeviceContactSync(true);
+
+                Intent intent = new Intent(context, DeviceContactSyncService.class);
+                DeviceContactSyncService.enqueueWork(context, intent);
 
 
                 /*Map<ApplozicSetting.RequestCode, String> activityCallbacks = new HashMap<ApplozicSetting.RequestCode, String>();

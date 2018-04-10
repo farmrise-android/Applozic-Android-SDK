@@ -100,7 +100,6 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
     private boolean loading = true;
     private int startingPageIndex = 0;
     private ProgressBar progressBar;
-    ContactsChangeObserver observer;
     private RelativeLayout startChatLayout;
     private Menu menu;
 
@@ -132,10 +131,6 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
         thread.start();
         setHasOptionsMenu(true);
         BroadcastService.lastIndexForChats = 0;
-
-        observer = new ContactsChangeObserver(null, getContext());
-        getContext().getApplicationContext().getContentResolver().registerContentObserver(
-                ContactsContract.Contacts.CONTENT_URI, true, observer);
     }
 
     @Override
@@ -692,9 +687,6 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(observer != null){
-            getContext().getApplicationContext().getContentResolver().unregisterContentObserver(observer);
-        }
     }
 
     @Override
