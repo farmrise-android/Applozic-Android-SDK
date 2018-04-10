@@ -83,6 +83,7 @@ public class AlCustomizationSettings extends JsonMarker {
     private boolean muteOption = true;
     private MobicomMessageTemplate messageTemplate;
     private String logoutPackageName;
+    private String groupDeletePackageName;
     private boolean logoutOption = false;
     private int defaultGroupType = 2;
     private boolean muteUserChatOption = false;
@@ -447,6 +448,11 @@ public class AlCustomizationSettings extends JsonMarker {
     public void setLogoutPackageName(String logoutPackageName) {
         this.logoutPackageName = logoutPackageName;
     }
+
+    public String getGroupDeletePackageName() {
+           return groupDeletePackageName;
+          }
+ 
 
     public String getThemeColorPrimary() {
         return themeColorPrimary;

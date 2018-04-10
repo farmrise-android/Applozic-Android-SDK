@@ -1,6 +1,5 @@
 package com.applozic.mobicomkit.sample;
 
-import android.*;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -62,18 +61,17 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
 
     public static final String TAB_HOME = "tab_home";
     public static final String TAB_CHAT = "tab_chat";
+    // Request code for READ_CONTACTS. It can be any number > 0.
+    private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
     private static int retry;
     protected ActionBar mActionBar;
     ConversationUIService conversationUIService;
     MobiComQuickConversationFragment mobiComQuickConversationFragment;
     MobiComKitBroadcastReceiver mobiComKitBroadcastReceiver;
-
     private HashMap<String, Stack<Fragment>> mStacks;
     private BottomNavigationView bottomNavigationView;
     private String currentTab;
     private boolean isStopCalled = false;
-    // Request code for READ_CONTACTS. It can be any number > 0.
-    private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
@@ -136,6 +134,14 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         mActionBar = getSupportActionBar();
         //Used to select an item programmatically
         //bottomNavigationView.getMenu().getItem(2).setChecked(true);
+
+        try {
+            if (getIntent() != null && getIntent().getExtras() != null && getIntent().getExtras().getBoolean(ConversationUIService.FROM_GROUP_DELETE)) {
+                bottomNavigationView.setSelectedItemId(R.id.action_chat);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
   /*  private void goToFragment(Fragment selectedFragment) {
@@ -152,7 +158,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
 
                 ActivityCompat.checkSelfPermission(this, android.Manifest.permission.READ_CONTACTS) !=
-                        PackageManager.PERMISSION_GRANTED){
+                        PackageManager.PERMISSION_GRANTED) {
 
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.READ_CONTACTS},
                     PERMISSIONS_REQUEST_READ_CONTACTS);
@@ -176,7 +182,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                 Toast.makeText(this, "Until you grant the permission, we cannot display the names",
                         Toast.LENGTH_SHORT).show();
             }
-        }else{
+        } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
@@ -257,7 +263,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                         !getSupportFragmentManager().isDestroyed()) {
 
                     if (shouldAdd)
-                    mStacks.get(tag).push(fragment);
+                        mStacks.get(tag).push(fragment);
                     //FragmentManager manager = getSupportFragmentManager();
                     FragmentTransaction ft = manager.beginTransaction();
                     ft.replace(R.id.layout_child_activity, fragment);
@@ -407,12 +413,12 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
     protected void onStop() {
         isStopCalled = true;
         super.onStop();
-        final String deviceKeyString = MobiComUserPreference.getInstance(this).getDeviceKeyString();
-        final String userKeyString = MobiComUserPreference.getInstance(this).getSuUserKeyString();
-        Intent intent = new Intent(this, ApplozicMqttIntentService.class);
-        intent.putExtra(ApplozicMqttIntentService.USER_KEY_STRING, userKeyString);
-        intent.putExtra(ApplozicMqttIntentService.DEVICE_KEY_STRING, deviceKeyString);
-        startService(intent);
+//        final String deviceKeyString = MobiComUserPreference.getInstance(this).getDeviceKeyString();
+//        final String userKeyString = MobiComUserPreference.getInstance(this).getSuUserKeyString();
+//        Intent intent = new Intent(this, ApplozicMqttIntentService.class);
+//        intent.putExtra(ApplozicMqttIntentService.USER_KEY_STRING, userKeyString);
+//        intent.putExtra(ApplozicMqttIntentService.DEVICE_KEY_STRING, deviceKeyString);
+//        startService(intent);
     }
 
     @Override
@@ -422,7 +428,9 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         LocalBroadcastManager.getInstance(this).registerReceiver(mobiComKitBroadcastReceiver, BroadcastService.getIntentFilter());
         Intent subscribeIntent = new Intent(this, ApplozicMqttIntentService.class);
         subscribeIntent.putExtra(ApplozicMqttIntentService.SUBSCRIBE, true);
-        startService(subscribeIntent);
+        //startService(subscribeIntent);
+
+        ApplozicMqttIntentService.enqueueWork(HomeActivity.this, subscribeIntent);
 
         if (!Utils.isInternetAvailable(this)) {
             String errorMessage = getResources().getString(R.string.internet_connection_not_available);
@@ -433,6 +441,12 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
     @Override
     protected void onPause() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mobiComKitBroadcastReceiver);
+        final String deviceKeyString = MobiComUserPreference.getInstance(this).getDeviceKeyString();
+        final String userKeyString = MobiComUserPreference.getInstance(this).getSuUserKeyString();
+        Intent intent = new Intent(this, ApplozicMqttIntentService.class);
+        intent.putExtra(ApplozicMqttIntentService.USER_KEY_STRING, userKeyString);
+        intent.putExtra(ApplozicMqttIntentService.DEVICE_KEY_STRING, deviceKeyString);
+        ApplozicMqttIntentService.enqueueWork(HomeActivity.this, intent);
         super.onPause();
     }
 
