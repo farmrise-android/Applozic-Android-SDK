@@ -69,6 +69,7 @@ import com.applozic.mobicomkit.contact.AppContactService;
 import com.applozic.mobicomkit.contact.BaseContactService;
 import com.applozic.mobicomkit.uiwidgets.AlCustomizationSettings;
 import com.applozic.mobicomkit.uiwidgets.ApplozicSetting;
+import com.applozic.mobicomkit.uiwidgets.ContactsChangeObserver;
 import com.applozic.mobicomkit.uiwidgets.R;
 import com.applozic.mobicomkit.uiwidgets.conversation.ConversationUIService;
 import com.applozic.mobicomkit.uiwidgets.conversation.MessageCommunicator;
@@ -168,6 +169,7 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
     private SearchView searchView;
     private String searchTerm;
     private SearchListFragment searchListFragment;
+    private ContactsChangeObserver observer;
 
     public ConversationActivity() {
 
@@ -265,11 +267,19 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
             String errorMessage = getResources().getString(R.string.internet_connection_not_available);
             showErrorMessageView(errorMessage);
         }
+
+        if (observer != null) {
+            getApplicationContext().getContentResolver().registerContentObserver(
+                    ContactsContract.Contacts.CONTENT_URI, true, observer);
+        }
     }
 
     @Override
     protected void onPause() {
         //ApplozicMqttService.getInstance(this).unSubscribe();
+        if (observer != null) {
+            getApplicationContext().getContentResolver().unregisterContentObserver(observer);
+        }
         super.onPause();
     }
 
@@ -434,6 +444,8 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
             }
         }
         LocalBroadcastManager.getInstance(this).registerReceiver(mobiComKitBroadcastReceiver, BroadcastService.getIntentFilter());
+
+        observer = new ContactsChangeObserver(null, this);
     }
 
     @Override
@@ -567,7 +579,7 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions,int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == PermissionsUtils.REQUEST_STORAGE) {
             if (PermissionsUtils.verifyPermissions(grantResults)) {
                 showSnackBar(R.string.storage_permission_granted);

@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -33,6 +34,7 @@ import com.applozic.mobicomkit.api.account.user.MobiComUserPreference;
 import com.applozic.mobicomkit.api.attachment.FileClientService;
 import com.applozic.mobicomkit.channel.service.ChannelService;
 import com.applozic.mobicomkit.uiwidgets.AlCustomizationSettings;
+import com.applozic.mobicomkit.uiwidgets.ContactsChangeObserver;
 import com.applozic.mobicomkit.uiwidgets.R;
 import com.applozic.mobicomkit.uiwidgets.conversation.ConversationUIService;
 import com.applozic.mobicomkit.uiwidgets.conversation.activity.ConversationActivity;
@@ -82,6 +84,7 @@ public class MobiComKitPeopleActivity extends AppCompatActivity implements OnCon
     OnContactsInteractionListener onContactsInteractionListener;
     private SearchListFragment searchListFragment;
     private boolean isSearchResultView = false;
+    private ContactsChangeObserver observer;
 
     public static void addFragment(FragmentActivity fragmentActivity, Fragment fragmentToAdd, String fragmentTag) {
         FragmentManager supportFragmentManager = fragmentActivity.getSupportFragmentManager();
@@ -173,6 +176,7 @@ public class MobiComKitPeopleActivity extends AppCompatActivity implements OnCon
       /*  if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             mContactsListFragment.onQueryTextChange(searchQuery);
         }*/
+        observer = new ContactsChangeObserver(null, this);
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -266,6 +270,24 @@ public class MobiComKitPeopleActivity extends AppCompatActivity implements OnCon
             intent.putExtra(GROUP_NAME, channel.getName());
             finishActivity(intent);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (observer != null) {
+            getApplicationContext().getContentResolver().registerContentObserver(
+                    ContactsContract.Contacts.CONTENT_URI, true, observer);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        if (observer != null) {
+            getApplicationContext().getContentResolver().unregisterContentObserver(observer);
+        }
+        super.onPause();
     }
 
     @Override

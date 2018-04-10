@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -36,6 +37,7 @@ import com.applozic.mobicomkit.broadcast.BroadcastService;
 import com.applozic.mobicomkit.contact.AppContactService;
 import com.applozic.mobicomkit.contact.database.ContactDatabase;
 import com.applozic.mobicomkit.uiwidgets.ApplozicSetting;
+import com.applozic.mobicomkit.uiwidgets.ContactsChangeObserver;
 import com.applozic.mobicomkit.uiwidgets.conversation.ConversationUIService;
 import com.applozic.mobicomkit.uiwidgets.conversation.MessageCommunicator;
 import com.applozic.mobicomkit.uiwidgets.conversation.MobiComKitBroadcastReceiver;
@@ -61,8 +63,6 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
 
     public static final String TAB_HOME = "tab_home";
     public static final String TAB_CHAT = "tab_chat";
-    // Request code for READ_CONTACTS. It can be any number > 0.
-    private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
     private static int retry;
     protected ActionBar mActionBar;
     ConversationUIService conversationUIService;
@@ -72,6 +72,10 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
     private BottomNavigationView bottomNavigationView;
     private String currentTab;
     private boolean isStopCalled = false;
+    // Request code for READ_CONTACTS. It can be any number > 0.
+    private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 100;
+    private ContactsChangeObserver observer;
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
@@ -166,8 +170,8 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
             // onRequestPermissionsResult(int, String[], int[]) override method
         } else {
             // Android version is lesser than 6.0 or the permission is already granted.
-            Intent intent = new Intent(this, DeviceContactSyncService.class);
-            DeviceContactSyncService.enqueueWork(this, intent);
+            /*Intent intent = new Intent(this, DeviceContactSyncService.class);
+            DeviceContactSyncService.enqueueWork(this, intent);*/
         }
     }
 
@@ -432,6 +436,11 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
 
         ApplozicMqttIntentService.enqueueWork(HomeActivity.this, subscribeIntent);
 
+        if (observer != null && MobiComUserPreference.getInstance(this).isLoggedIn()) {
+            getApplicationContext().getContentResolver().registerContentObserver(
+                    ContactsContract.Contacts.CONTENT_URI, true, observer);
+        }
+
         if (!Utils.isInternetAvailable(this)) {
             String errorMessage = getResources().getString(R.string.internet_connection_not_available);
             showErrorMessageView(errorMessage);
@@ -441,12 +450,17 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
     @Override
     protected void onPause() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mobiComKitBroadcastReceiver);
-        final String deviceKeyString = MobiComUserPreference.getInstance(this).getDeviceKeyString();
-        final String userKeyString = MobiComUserPreference.getInstance(this).getSuUserKeyString();
-        Intent intent = new Intent(this, ApplozicMqttIntentService.class);
-        intent.putExtra(ApplozicMqttIntentService.USER_KEY_STRING, userKeyString);
-        intent.putExtra(ApplozicMqttIntentService.DEVICE_KEY_STRING, deviceKeyString);
-        ApplozicMqttIntentService.enqueueWork(HomeActivity.this, intent);
+//<<<<<<< HEAD
+//        final String deviceKeyString = MobiComUserPreference.getInstance(this).getDeviceKeyString();
+//        final String userKeyString = MobiComUserPreference.getInstance(this).getSuUserKeyString();
+//        Intent intent = new Intent(this, ApplozicMqttIntentService.class);
+//        intent.putExtra(ApplozicMqttIntentService.USER_KEY_STRING, userKeyString);
+//        intent.putExtra(ApplozicMqttIntentService.DEVICE_KEY_STRING, deviceKeyString);
+//        ApplozicMqttIntentService.enqueueWork(HomeActivity.this, intent);
+//=======
+        if (observer != null && MobiComUserPreference.getInstance(this).isLoggedIn()) {
+            getApplicationContext().getContentResolver().unregisterContentObserver(observer);
+        }
         super.onPause();
     }
 
@@ -461,6 +475,9 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                 ApplozicClient.getInstance(context).setContextBasedChat(true).setHandleDial(true);
 
                 ApplozicClient.getInstance(context).enableDeviceContactSync(true);
+
+                Intent intent = new Intent(context, DeviceContactSyncService.class);
+                DeviceContactSyncService.enqueueWork(context, intent);
 
 
                 /*Map<ApplozicSetting.RequestCode, String> activityCallbacks = new HashMap<ApplozicSetting.RequestCode, String>();
