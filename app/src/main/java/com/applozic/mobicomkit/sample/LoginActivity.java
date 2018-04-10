@@ -95,7 +95,6 @@ public class LoginActivity extends Activity implements ActivityCompat.OnRequestP
         super.onCreate(savedInstanceState);
         //FacebookSdk.sdkInitialize(this);
 
-        Applozic.init(this,getString(R.string.application_key));
 
         setContentView(R.layout.activity_login);
         setupUI(findViewById(R.id.layout));

@@ -246,12 +246,6 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
     @Override
     protected void onStop() {
         super.onStop();
-        final String deviceKeyString = MobiComUserPreference.getInstance(this).getDeviceKeyString();
-        final String userKeyString = MobiComUserPreference.getInstance(this).getSuUserKeyString();
-        Intent intent = new Intent(this, ApplozicMqttIntentService.class);
-        intent.putExtra(ApplozicMqttIntentService.USER_KEY_STRING, userKeyString);
-        intent.putExtra(ApplozicMqttIntentService.DEVICE_KEY_STRING, deviceKeyString);
-        ApplozicMqttIntentService.enqueueWork(this, intent);
     }
 
     @Override
@@ -269,7 +263,12 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
 
     @Override
     protected void onPause() {
-        //ApplozicMqttService.getInstance(this).unSubscribe();
+        final String deviceKeyString = MobiComUserPreference.getInstance(this).getDeviceKeyString();
+        final String userKeyString = MobiComUserPreference.getInstance(this).getSuUserKeyString();
+        Intent intent = new Intent(this, ApplozicMqttIntentService.class);
+        intent.putExtra(ApplozicMqttIntentService.USER_KEY_STRING, userKeyString);
+        intent.putExtra(ApplozicMqttIntentService.DEVICE_KEY_STRING, deviceKeyString);
+        ApplozicMqttIntentService.enqueueWork(this, intent);
         super.onPause();
     }
 
@@ -567,7 +566,7 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions,int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == PermissionsUtils.REQUEST_STORAGE) {
             if (PermissionsUtils.verifyPermissions(grantResults)) {
                 showSnackBar(R.string.storage_permission_granted);

@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.applozic.mobicomkit.Applozic;
 import com.applozic.mobicomkit.ApplozicClient;
+import com.applozic.mobicomkit.api.MobiComKitConstants;
 import com.applozic.mobicomkit.api.account.register.RegistrationResponse;
 import com.applozic.mobicomkit.api.account.user.MobiComUserPreference;
 import com.applozic.mobicomkit.api.account.user.PushNotificationTask;
@@ -137,9 +138,16 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         mActionBar = getSupportActionBar();
         //Used to select an item programmatically
         //bottomNavigationView.getMenu().getItem(2).setChecked(true);
+        try {
+            if (getIntent() != null && getIntent().getExtras() != null && getIntent().getExtras().getBoolean(ConversationUIService.FROM_GROUP_DELETE)) {
+                bottomNavigationView.setSelectedItemId(R.id.action_chat);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-  /*  private void goToFragment(Fragment selectedFragment) {
+    /*  private void goToFragment(Fragment selectedFragment) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.layout_child_activity, selectedFragment);
         fragmentTransaction.commit();
@@ -153,7 +161,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
 
                 ActivityCompat.checkSelfPermission(this, android.Manifest.permission.READ_CONTACTS) !=
-                        PackageManager.PERMISSION_GRANTED){
+                        PackageManager.PERMISSION_GRANTED) {
 
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.READ_CONTACTS},
                     PERMISSIONS_REQUEST_READ_CONTACTS);
@@ -177,7 +185,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                 Toast.makeText(this, "Until you grant the permission, we cannot display the names",
                         Toast.LENGTH_SHORT).show();
             }
-        }else{
+        } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
@@ -193,7 +201,6 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         mStacks = new HashMap<>();
         mStacks.put(TAB_HOME, new Stack<Fragment>());
         mStacks.put(TAB_CHAT, new Stack<Fragment>());
-        Applozic.init(this, "orphan12e5101382f0cc751fa8c224");
 
 
     }
@@ -221,7 +228,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                     }
                     startActivity(intent);*/
 
-                    addFragment(this, mobiComQuickConversationFragment, ConversationUIService.QUICK_CONVERSATION_FRAGMENT); //here we are adding fragment
+                 addFragment(this, mobiComQuickConversationFragment, ConversationUIService.QUICK_CONVERSATION_FRAGMENT); //here we are adding fragment
                     pushFragments(tabId, mobiComQuickConversationFragment, true);
 
                 } else {
@@ -249,7 +256,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                         !getSupportFragmentManager().isDestroyed()) {
 
                     if (shouldAdd)
-                    mStacks.get(tag).push(fragment);
+                        mStacks.get(tag).push(fragment);
                     //FragmentManager manager = getSupportFragmentManager();
                     FragmentTransaction ft = manager.beginTransaction();
                     ft.replace(R.id.layout_child_activity, fragment);
@@ -399,12 +406,6 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
     protected void onStop() {
         isStopCalled = true;
         super.onStop();
-        final String deviceKeyString = MobiComUserPreference.getInstance(this).getDeviceKeyString();
-        final String userKeyString = MobiComUserPreference.getInstance(this).getSuUserKeyString();
-        Intent intent = new Intent(this, ApplozicMqttIntentService.class);
-        intent.putExtra(ApplozicMqttIntentService.USER_KEY_STRING, userKeyString);
-        intent.putExtra(ApplozicMqttIntentService.DEVICE_KEY_STRING, deviceKeyString);
-        startService(intent);
     }
 
     @Override
@@ -414,7 +415,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         LocalBroadcastManager.getInstance(this).registerReceiver(mobiComKitBroadcastReceiver, BroadcastService.getIntentFilter());
         Intent subscribeIntent = new Intent(this, ApplozicMqttIntentService.class);
         subscribeIntent.putExtra(ApplozicMqttIntentService.SUBSCRIBE, true);
-        startService(subscribeIntent);
+        ApplozicMqttIntentService.enqueueWork(HomeActivity.this, subscribeIntent);
 
         if (!Utils.isInternetAvailable(this)) {
             String errorMessage = getResources().getString(R.string.internet_connection_not_available);
@@ -425,6 +426,12 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
     @Override
     protected void onPause() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mobiComKitBroadcastReceiver);
+        final String deviceKeyString = MobiComUserPreference.getInstance(this).getDeviceKeyString();
+        final String userKeyString = MobiComUserPreference.getInstance(this).getSuUserKeyString();
+        Intent intent = new Intent(this, ApplozicMqttIntentService.class);
+        intent.putExtra(ApplozicMqttIntentService.USER_KEY_STRING, userKeyString);
+        intent.putExtra(ApplozicMqttIntentService.DEVICE_KEY_STRING, deviceKeyString);
+        ApplozicMqttIntentService.enqueueWork(HomeActivity.this, intent);
         super.onPause();
     }
 
@@ -502,11 +509,10 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         };
 
         User user = new User();
-        user.setUserId("testapplozicuser7");
+        user.setUserId("userDevice");
         //user.setEmail("pskreddy"@gmail.com);
-        user.setContactNumber("+91 7777777777");
-        user.setPassword("7777777777");
-        user.setDisplayName("Seven"); //display name and user name are similar //Sai //In all contacts, conatct shows with display name and number
+        user.setPassword("123");
+        user.setDisplayName("LG"); //display name and user name are similar //Sai //In all contacts, conatct shows with display name and number
         //user.setAuthenticationTypeId(authenticationType.getValue());
 
 

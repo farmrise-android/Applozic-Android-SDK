@@ -48,6 +48,7 @@ import com.applozic.mobicomkit.ApplozicClient;
 import com.applozic.mobicomkit.api.MobiComKitConstants;
 import com.applozic.mobicomkit.api.account.user.MobiComUserPreference;
 import com.applozic.mobicomkit.api.account.user.RegisteredUsersAsyncTask;
+import com.applozic.mobicomkit.api.account.user.UserClientService;
 import com.applozic.mobicomkit.api.attachment.FileClientService;
 import com.applozic.mobicomkit.broadcast.BroadcastService;
 import com.applozic.mobicomkit.broadcast.ConnectivityReceiver;
@@ -912,15 +913,30 @@ public class ChannelInfoActivity extends AppCompatActivity {
                 }
             }
             if (!TextUtils.isEmpty(responseForDeleteGroup) && SUCCESS.equals(responseForDeleteGroup)) {
-                Intent intent = new Intent(ChannelInfoActivity.this, ConversationActivity.class);
-                if (ApplozicClient.getInstance(ChannelInfoActivity.this).isContextBasedChat()) {
-                    intent.putExtra(ConversationUIService.CONTEXT_BASED_CHAT, true);
+                try {
+                    if (!TextUtils.isEmpty(alCustomizationSettings.getGroupDeletePackageName())) {
+                        Class HomeActivity = Class.forName(alCustomizationSettings.getGroupDeletePackageName().trim());
+                        if (HomeActivity != null) {
+                            userPreference.setDeleteChannel(true);
+                            Intent intent = new Intent(ChannelInfoActivity.this, HomeActivity);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                            intent.putExtra(ConversationUIService.FROM_GROUP_DELETE, true);
+                            startActivity(intent);
+                            finish();
+                        }
+                    } else {
+                        Intent intent = new Intent(ChannelInfoActivity.this, ConversationActivity.class);
+                        if (ApplozicClient.getInstance(ChannelInfoActivity.this).isContextBasedChat()) {
+                            intent.putExtra(ConversationUIService.CONTEXT_BASED_CHAT, true);
+                        }
+                        startActivity(intent);
+                        userPreference.setDeleteChannel(true);
+                        finish();
+                    }
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
                 }
-                startActivity(intent);
-                userPreference.setDeleteChannel(true);
-                finish();
             }
-
         }
     }
 
