@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.applozic.mobicomkit.Applozic;
 import com.applozic.mobicomkit.ApplozicClient;
+import com.applozic.mobicomkit.api.MobiComKitConstants;
 import com.applozic.mobicomkit.api.account.register.RegistrationResponse;
 import com.applozic.mobicomkit.api.account.user.MobiComUserPreference;
 import com.applozic.mobicomkit.api.account.user.PushNotificationTask;
@@ -153,7 +154,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
 
     }
 
-  /*  private void goToFragment(Fragment selectedFragment) {
+    /*  private void goToFragment(Fragment selectedFragment) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.layout_child_activity, selectedFragment);
         fragmentTransaction.commit();
@@ -207,7 +208,6 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         mStacks = new HashMap<>();
         mStacks.put(TAB_HOME, new Stack<Fragment>());
         mStacks.put(TAB_CHAT, new Stack<Fragment>());
-        Applozic.init(this, "orphan12e5101382f0cc751fa8c224");
 
 
     }
@@ -236,7 +236,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
                     }
                     startActivity(intent);*/
 
-                    addFragment(this, mobiComQuickConversationFragment, ConversationUIService.QUICK_CONVERSATION_FRAGMENT); //here we are adding fragment
+                 addFragment(this, mobiComQuickConversationFragment, ConversationUIService.QUICK_CONVERSATION_FRAGMENT); //here we are adding fragment
                     pushFragments(tabId, mobiComQuickConversationFragment, true);
 
                 } else {
@@ -408,12 +408,6 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
     protected void onStop() {
         isStopCalled = true;
         super.onStop();
-//        final String deviceKeyString = MobiComUserPreference.getInstance(this).getDeviceKeyString();
-//        final String userKeyString = MobiComUserPreference.getInstance(this).getSuUserKeyString();
-//        Intent intent = new Intent(this, ApplozicMqttIntentService.class);
-//        intent.putExtra(ApplozicMqttIntentService.USER_KEY_STRING, userKeyString);
-//        intent.putExtra(ApplozicMqttIntentService.DEVICE_KEY_STRING, deviceKeyString);
-//        startService(intent);
     }
 
     @Override
@@ -423,6 +417,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         LocalBroadcastManager.getInstance(this).registerReceiver(mobiComKitBroadcastReceiver, BroadcastService.getIntentFilter());
         Intent subscribeIntent = new Intent(this, ApplozicMqttIntentService.class);
         subscribeIntent.putExtra(ApplozicMqttIntentService.SUBSCRIBE, true);
+
         //startService(subscribeIntent);
 
         ApplozicMqttIntentService.enqueueWork(HomeActivity.this, subscribeIntent);
@@ -431,6 +426,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
             getApplicationContext().getContentResolver().registerContentObserver(
                     ContactsContract.Contacts.CONTENT_URI, true, observer);
         }
+
 
         if (!Utils.isInternetAvailable(this)) {
             String errorMessage = getResources().getString(R.string.internet_connection_not_available);
@@ -441,6 +437,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
     @Override
     protected void onPause() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mobiComKitBroadcastReceiver);
+
 //<<<<<<< HEAD
 //        final String deviceKeyString = MobiComUserPreference.getInstance(this).getDeviceKeyString();
 //        final String userKeyString = MobiComUserPreference.getInstance(this).getSuUserKeyString();
@@ -448,10 +445,11 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
 //        intent.putExtra(ApplozicMqttIntentService.USER_KEY_STRING, userKeyString);
 //        intent.putExtra(ApplozicMqttIntentService.DEVICE_KEY_STRING, deviceKeyString);
 //        ApplozicMqttIntentService.enqueueWork(HomeActivity.this, intent);
-//=======
+//
         if (observer != null && MobiComUserPreference.getInstance(this).isLoggedIn()) {
             getApplicationContext().getContentResolver().unregisterContentObserver(observer);
         }
+
         super.onPause();
     }
 

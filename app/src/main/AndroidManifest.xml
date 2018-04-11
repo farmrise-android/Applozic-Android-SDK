@@ -50,8 +50,9 @@
 
         <activity
             android:name=".HomeActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:configChanges="keyboardHidden|screenSize|locale|smallestScreenSize|screenLayout|orientation"
             android:exported="true"
+            android:launchMode="singleTop"
             android:label="@string/ecommerce"
             android:theme="@style/FarmRiseTheme"
             android:windowSoftInputMode="adjustPan"/>

@@ -122,14 +122,13 @@ public class ConversationUIService {
         this.fileClientService = new FileClientService(fragmentActivity);
     }
 
-    public ConversationUIService(FragmentActivity fragmentActivity,MobiComQuickConversationFragment mobiComQuickConversationFragment) {
+    public ConversationUIService(FragmentActivity fragmentActivity, MobiComQuickConversationFragment mobiComQuickConversationFragment) {
         this.fragmentActivity = fragmentActivity;
         this.mobiComQuickConversationFragment = mobiComQuickConversationFragment;
         this.baseContactService = new AppContactService(fragmentActivity);
-        this.notificationManager  = (NotificationManager) fragmentActivity.getSystemService(Context.NOTIFICATION_SERVICE);
+        this.notificationManager = (NotificationManager) fragmentActivity.getSystemService(Context.NOTIFICATION_SERVICE);
         this.userPreference = MobiComUserPreference.getInstance(fragmentActivity);
     }
-
 
 
 //    public MobiComQuickConversationFragment getQuickConversationFragment() {
@@ -177,6 +176,7 @@ public class ConversationUIService {
                 if (conversationFragment == null) {
                     conversationFragment = ConversationFragment.newInstance(contact, null, conversationId, searchString);
                     ((MobiComKitActivityInterface) fragmentActivity).addFragment(conversationFragment);
+
                 } else {
                     UserProfileFragment userProfileFragment = (UserProfileFragment) UIService.getFragmentByTag(fragmentActivity, ConversationUIService.USER_PROFILE_FRAMENT);
                     MessageInfoFragment messageInfoFragment = (MessageInfoFragment) UIService.getFragmentByTag(fragmentActivity, ConversationUIService.MESSGAE_INFO_FRAGMENT);
@@ -454,9 +454,9 @@ public class ConversationUIService {
             }
 
             if (mobiComQuickConversationFragment != null) {
-                if(message.isHidden()){
+                if (message.isHidden()) {
                     mobiComQuickConversationFragment.refreshView();
-                }else {
+                } else {
                     mobiComQuickConversationFragment.addMessage(message);
                 }
             }
@@ -536,8 +536,9 @@ public class ConversationUIService {
     public void updateLastSeenStatus(String contactId) {
         if (BroadcastService.isQuick()) {
             if( getQuickConversationFragment() == null){
-                               return;
-                }
+
+                return;
+            }
             getQuickConversationFragment().updateLastSeenStatus(contactId);
             return;
         }
@@ -949,7 +950,7 @@ public class ConversationUIService {
                     ((MobiComKitActivityInterface) fragmentActivity).retry();
                     Intent intent = new Intent(fragmentActivity, ApplozicMqttIntentService.class);
                     intent.putExtra(ApplozicMqttIntentService.SUBSCRIBE, true);
-                    ApplozicMqttIntentService.enqueueWork(fragmentActivity,intent);
+                    ApplozicMqttIntentService.enqueueWork(fragmentActivity, intent);
 
                 }
             }

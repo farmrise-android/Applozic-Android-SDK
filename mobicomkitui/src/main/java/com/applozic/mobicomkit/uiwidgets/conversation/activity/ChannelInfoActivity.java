@@ -48,6 +48,7 @@ import com.applozic.mobicomkit.ApplozicClient;
 import com.applozic.mobicomkit.api.MobiComKitConstants;
 import com.applozic.mobicomkit.api.account.user.MobiComUserPreference;
 import com.applozic.mobicomkit.api.account.user.RegisteredUsersAsyncTask;
+import com.applozic.mobicomkit.api.account.user.UserClientService;
 import com.applozic.mobicomkit.api.attachment.FileClientService;
 import com.applozic.mobicomkit.broadcast.BroadcastService;
 import com.applozic.mobicomkit.broadcast.ConnectivityReceiver;
@@ -920,6 +921,7 @@ public class ChannelInfoActivity extends AppCompatActivity {
 //                userPreference.setDeleteChannel(true);
 //                finish();
 
+
                 try {
                     if (!TextUtils.isEmpty(alCustomizationSettings.getGroupDeletePackageName())) {
                         Class HomeActivity = Class.forName(alCustomizationSettings.getGroupDeletePackageName().trim());
@@ -944,7 +946,6 @@ public class ChannelInfoActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-
         }
     }
 

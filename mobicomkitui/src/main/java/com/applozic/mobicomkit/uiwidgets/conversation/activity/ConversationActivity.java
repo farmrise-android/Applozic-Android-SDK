@@ -254,6 +254,7 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
 //        intent.putExtra(ApplozicMqttIntentService.USER_KEY_STRING, userKeyString);
 //        intent.putExtra(ApplozicMqttIntentService.DEVICE_KEY_STRING, deviceKeyString);
 //        ApplozicMqttIntentService.enqueueWork(this, intent);
+
     }
 
     @Override
