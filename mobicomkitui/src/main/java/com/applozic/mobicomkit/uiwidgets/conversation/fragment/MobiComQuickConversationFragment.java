@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Process;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -80,7 +81,7 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
     protected List<Message> messageList = new ArrayList<Message>();
     protected QuickConversationAdapter recyclerAdapter = null;
     protected boolean loadMore = false;
-    protected SyncCallService syncCallService;
+    //protected SyncCallService syncCallService;
     ConversationUIService conversationUIService;
     AlCustomizationSettings alCustomizationSettings;
     String searchString;
@@ -100,6 +101,7 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
     private boolean loading = true;
     private int startingPageIndex = 0;
     private ProgressBar progressBar;
+    //ContactsChangeObserver observer;
     private RelativeLayout startChatLayout;
     private Menu menu;
 
@@ -116,7 +118,7 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
         } else {
             alCustomizationSettings = new AlCustomizationSettings();
         }
-        syncCallService = SyncCallService.getInstance(getActivity());
+        //syncCallService = SyncCallService.getInstance(getActivity());
         conversationUIService = new ConversationUIService(getActivity());
         baseContactService = new AppContactService(getActivity());
         messageDatabaseService = new MessageDatabaseService(getActivity());
@@ -131,10 +133,13 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
         thread.start();
         setHasOptionsMenu(true);
         BroadcastService.lastIndexForChats = 0;
+
+//        observer = new ContactsChangeObserver(null, getContext());
+//        getContext().getApplicationContext().getContentResolver().registerContentObserver(ContactsContract.Contacts.CONTENT_URI, true, observer);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View list = inflater.inflate(R.layout.mobicom_message_list, container, false);
 
@@ -687,6 +692,10 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        //if (observer != null) {
+          //  getContext().getApplicationContext().getContentResolver().unregisterContentObserver(observer);
+        //}
     }
 
     @Override
@@ -858,6 +867,7 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
         private WeakReference<SwipeRefreshLayout> swipeRefreshLayoutWeakReference;
         private WeakReference<QuickConversationAdapter> quickConversationAdapterWeakReference;
         private WeakReference<TextView> textViewWeakReference;
+        private SyncCallService syncCallService;
 
         public DownloadConversation(RecyclerView view, boolean initial, int firstVisibleItem, int amountVisible, int totalItems, boolean showInstruction, String searchString) {
             this.context = getActivity();
@@ -868,6 +878,7 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
             this.totalItems = totalItems;
             this.showInstruction = showInstruction;
             this.searchString = searchString;
+            this.syncCallService = SyncCallService.getInstance(getActivity());
         }
 
         public DownloadConversation(RecyclerView view, boolean initial, int firstVisibleItem, int amountVisible, int totalItems) {
@@ -1063,8 +1074,10 @@ public class MobiComQuickConversationFragment extends Fragment implements Search
     }
 
     private class SyncMessages extends AsyncTask<Void, Integer, Long> {
+        private SyncCallService syncCallService;
 
         SyncMessages() {
+            this.syncCallService = SyncCallService.getInstance(getActivity());
         }
 
         @Override

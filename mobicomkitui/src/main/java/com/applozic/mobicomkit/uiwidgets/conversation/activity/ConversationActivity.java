@@ -248,12 +248,12 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
     @Override
     protected void onStop() {
         super.onStop();
-        final String deviceKeyString = MobiComUserPreference.getInstance(this).getDeviceKeyString();
-        final String userKeyString = MobiComUserPreference.getInstance(this).getSuUserKeyString();
-        Intent intent = new Intent(this, ApplozicMqttIntentService.class);
-        intent.putExtra(ApplozicMqttIntentService.USER_KEY_STRING, userKeyString);
-        intent.putExtra(ApplozicMqttIntentService.DEVICE_KEY_STRING, deviceKeyString);
-        ApplozicMqttIntentService.enqueueWork(this, intent);
+//        final String deviceKeyString = MobiComUserPreference.getInstance(this).getDeviceKeyString();
+//        final String userKeyString = MobiComUserPreference.getInstance(this).getSuUserKeyString();
+//        Intent intent = new Intent(this, ApplozicMqttIntentService.class);
+//        intent.putExtra(ApplozicMqttIntentService.USER_KEY_STRING, userKeyString);
+//        intent.putExtra(ApplozicMqttIntentService.DEVICE_KEY_STRING, deviceKeyString);
+//        ApplozicMqttIntentService.enqueueWork(this, intent);
     }
 
     @Override
@@ -355,8 +355,6 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
         mobiComMessageService = new MobiComMessageService(this, MessageIntentService.class);
         quickConversationFragment = new MobiComQuickConversationFragment();
         conversationUIService = new ConversationUIService(this);
-
-
         connectivityReceiver = new ConnectivityReceiver();
         geoApiKey = Utils.getMetaDataValue(getApplicationContext(), GOOGLE_API_KEY_META_DATA);
         activityToOpenOnClickOfCallButton = Utils.getMetaDataValue(getApplicationContext(), ACTIVITY_TO_OPEN_ONCLICK_OF_CALL_BUTTON_META_DATA);
@@ -468,8 +466,7 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
                     return;
                 }
 
-                BroadcastService.setContextBasedChat(intent.getExtras().
-                        getBoolean(ConversationUIService.CONTEXT_BASED_CHAT));
+                BroadcastService.setContextBasedChat(intent.getExtras().getBoolean(ConversationUIService.CONTEXT_BASED_CHAT));
                 if (BroadcastService.isIndividual() && intent.getExtras().getBoolean(MobiComKitConstants.QUICK_LIST)) {
                     setSearchListFragment(quickConversationFragment);
                     addFragment(this, quickConversationFragment, ConversationUIService.QUICK_CONVERSATION_FRAGMENT);
@@ -579,7 +576,7 @@ public class ConversationActivity extends AppCompatActivity implements MessageCo
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == PermissionsUtils.REQUEST_STORAGE) {
             if (PermissionsUtils.verifyPermissions(grantResults)) {
                 showSnackBar(R.string.storage_permission_granted);

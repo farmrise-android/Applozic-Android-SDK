@@ -32,6 +32,7 @@ import com.applozic.mobicomkit.api.account.user.User;
 import com.applozic.mobicomkit.api.account.user.UserLoginTask;
 import com.applozic.mobicomkit.api.conversation.ApplozicMqttIntentService;
 import com.applozic.mobicomkit.api.conversation.Message;
+import com.applozic.mobicomkit.api.conversation.SyncCallService;
 import com.applozic.mobicomkit.api.people.UserIntentService;
 import com.applozic.mobicomkit.broadcast.BroadcastService;
 import com.applozic.mobicomkit.contact.AppContactService;
@@ -127,6 +128,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
 
         //Manually displaying the first fragment - one time only
         bottomNavigationView.setSelectedItemId(R.id.action_home);
+
         mobiComQuickConversationFragment = new MobiComQuickConversationFragment();
         conversationUIService = new ConversationUIService(this, mobiComQuickConversationFragment);
         mobiComKitBroadcastReceiver = new MobiComKitBroadcastReceiver(this, mobiComQuickConversationFragment);
@@ -140,12 +142,15 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         //bottomNavigationView.getMenu().getItem(2).setChecked(true);
 
         try {
-            if (getIntent() != null && getIntent().getExtras() != null && getIntent().getExtras().getBoolean(ConversationUIService.FROM_GROUP_DELETE)) {
+            if (getIntent() != null && getIntent().getExtras() != null &&
+                    getIntent().getExtras().getBoolean(ConversationUIService.FROM_GROUP_DELETE)) {
                 bottomNavigationView.setSelectedItemId(R.id.action_chat);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+
     }
 
   /*  private void goToFragment(Fragment selectedFragment) {
@@ -398,21 +403,7 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         return retry;
     }
 
-    /*@Override
-    public void onBackPressed() {
 
-        int count = getFragmentManager().getBackStackEntryCount();
-
-        if (count == 0) {
-            super.onBackPressed();
-            finishAffinity();
-
-            //additional code
-        } else {
-            getFragmentManager().popBackStack();
-        }
-
-    }*/
     @Override
     protected void onStop() {
         isStopCalled = true;
@@ -541,11 +532,11 @@ public class HomeActivity extends AppCompatActivity implements MessageCommunicat
         };
 
         User user = new User();
-        user.setUserId("testapplozicuser8");
+        user.setUserId("newusertesting");
         //user.setEmail("pskreddy"@gmail.com);
-        user.setContactNumber("+91 8888888888");
-        user.setPassword("8888888888");
-        user.setDisplayName("TestEight"); //display name and user name are similar //Sai //In all contacts, conatct shows with display name and number
+        user.setContactNumber("+91 8888800000");
+        user.setPassword("8888800000");
+        user.setDisplayName("TestNew"); //display name and user name are similar //Sai //In all contacts, conatct shows with display name and number
         //user.setAuthenticationTypeId(authenticationType.getValue());
 
 

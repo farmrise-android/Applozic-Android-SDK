@@ -396,7 +396,7 @@ public class ContactSelectionFragment extends ListFragment implements SearchList
         btn_invite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity(), "Invite contatcs", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "Invite contacts", Toast.LENGTH_LONG).show();
             }
         });
 

@@ -87,6 +87,7 @@ public class ConversationUIService {
     public static final String FIRST_TIME_MTEXTER_FRIEND = "firstTimeMTexterFriend";
     public static final String CONTACT_ID = "contactId";
     public static final String CONTEXT_BASED_CHAT = "contextBasedChat";
+    public static final String FROM_GROUP_DELETE = "fromGroupDelete";
     public static final String CONTACT_NUMBER = "contactNumber";
     public static final String APPLICATION_ID = "applicationId";
     public static final String DEFAULT_TEXT = "defaultText";
@@ -534,6 +535,9 @@ public class ConversationUIService {
 
     public void updateLastSeenStatus(String contactId) {
         if (BroadcastService.isQuick()) {
+            if( getQuickConversationFragment() == null){
+                               return;
+                }
             getQuickConversationFragment().updateLastSeenStatus(contactId);
             return;
         }
